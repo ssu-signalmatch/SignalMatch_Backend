@@ -31,7 +31,9 @@ public class UserService {
         User newUser = User.builder()
                 .loginId(signupRequest.loginId())
                 .password(encodedPassword)
-                .name(signupRequest.name()).build();
+                .name(signupRequest.name())
+                .userRole(signupRequest.userRole())
+                .build();
         userRepository.save(newUser);
     }
 
