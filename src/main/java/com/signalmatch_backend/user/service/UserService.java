@@ -45,4 +45,9 @@ public class UserService {
 
         return new LoginResponse(accessToken);
     }
+
+    public void delete(Long userId) {
+        User user = userFinder.findByUserId(userId);
+        userRepository.delete(user);
+    }
 }

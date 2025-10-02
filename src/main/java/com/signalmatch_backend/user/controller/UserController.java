@@ -4,15 +4,14 @@ import com.signalmatch_backend.common.domain.ApiResponse;
 import com.signalmatch_backend.user.dto.LoginRequest;
 import com.signalmatch_backend.user.dto.LoginResponse;
 import com.signalmatch_backend.user.dto.SignupRequest;
+import com.signalmatch_backend.user.jwt.CustomUserDetails;
 import com.signalmatch_backend.user.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.*;
 
 @RestController
 @RequiredArgsConstructor
@@ -33,5 +32,13 @@ public class UserController {
     public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody LoginRequest loginRequest){
         LoginResponse response = userService.login(loginRequest);
         return ResponseEntity.ok(ApiResponse.success("로그인이 완료되었습니다.",response));
+    }
+
+    @DeleteMapping("/auth")
+    @Operation(summary = "회원 탈퇴", description = "회원 정보를 삭제하는 API입니다.")
+    public ResponseEntity<ApiResponse<Void>> delete(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long userId = customUserDetails.getUser().getUserId();
+        userService.delete(userId);
+        return ResponseEntity.ok(ApiResponse.success("회원이 삭제되었습니다."));
     }
 }
