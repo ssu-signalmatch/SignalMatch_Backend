@@ -2,8 +2,12 @@ package com.signalmatch_backend.user.service;
 
 import com.signalmatch_backend.common.exception.CustomException;
 import com.signalmatch_backend.common.exception.ErrorCode;
+import com.signalmatch_backend.user.UserFinder;
 import com.signalmatch_backend.user.domain.User;
+import com.signalmatch_backend.user.dto.LoginRequest;
+import com.signalmatch_backend.user.dto.LoginResponse;
 import com.signalmatch_backend.user.dto.SignupRequest;
+import com.signalmatch_backend.user.jwt.JwtUtil;
 import com.signalmatch_backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,6 +18,8 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 public class UserService {
     private final UserRepository userRepository;
     private final PasswordEncoder passwordEncoder;
+    private final UserFinder userFinder;
+    private final JwtUtil jwtUtil;
 
     public void signup(SignupRequest signupRequest) {
         if(userRepository.existsByLoginId(signupRequest.loginId())){
@@ -29,4 +35,14 @@ public class UserService {
         userRepository.save(newUser);
     }
 
+    public LoginResponse login(LoginRequest loginRequest) {
+        User user = userFinder.findByLoginId(loginRequest.loginId());
+        if(!passwordEncoder.matches(loginRequest.password(), user.getPassword())){
+            throw new CustomException(ErrorCode.PASSWORD_NOT_MATCH);
+        }
+
+        String accessToken = jwtUtil.createAccessToken(loginRequest.loginId());
+
+        return new LoginResponse(accessToken);
+    }
 }
