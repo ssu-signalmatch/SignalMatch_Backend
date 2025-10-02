@@ -16,12 +16,9 @@ public class InvestorPreferredStage {
     @EmbeddedId
     private InvestorPreferredStageKey id;
 
-    @Id
-    @Column(name = "stage_code", length = 20, nullable = false)
-    @Enumerated(EnumType.STRING)
-    private StageCode stageCode; // SEED, SERIES_A, SERIES_B, SERIES_C ...
-
+    @MapsId("investorId")
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "investor_id")
+    @JoinColumn(name = "investor_id", nullable = false)
     private Investor investor;
+
 }
