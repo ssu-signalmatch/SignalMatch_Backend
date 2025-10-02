@@ -1,5 +1,6 @@
 package com.signalmatch_backend.user.dto;
 
+import com.signalmatch_backend.user.domain.enums.UserRole;
 import io.swagger.v3.oas.annotations.media.Schema;
 
 public record SignupRequest(
@@ -8,6 +9,8 @@ public record SignupRequest(
         @Schema(description = "비밀번호")
         String password,
         @Schema(description = "유저 이름")
-        String name
+        String name,
+        @Schema(description = "유저 역할( INVESTOR, STARTUP)")
+        UserRole userRole
 ){
 }

@@ -1,6 +1,7 @@
 package com.signalmatch_backend.user.domain;
 
 import com.signalmatch_backend.common.domain.BaseEntity;
+import com.signalmatch_backend.user.domain.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -24,4 +25,8 @@ public class User extends BaseEntity {
 
     @Column(nullable = false, length = 255)
     private String password;
+
+    @Enumerated(EnumType.STRING)
+    @Column(nullable = false, length = 20)
+    private UserRole userRole;
 }
