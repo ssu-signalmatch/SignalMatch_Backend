@@ -11,6 +11,7 @@ import com.signalmatch_backend.investor.domain.key.InvestorPreferredStageKey;
 import com.signalmatch_backend.investor.dto.InvestorProfileCreateRequest;
 import com.signalmatch_backend.investor.dto.InvestorProfileCreateResponse;
 import com.signalmatch_backend.investor.repository.InvestorRepository;
+import com.signalmatch_backend.user.UserFinder;
 import com.signalmatch_backend.user.domain.User;
 import com.signalmatch_backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
@@ -22,10 +23,10 @@ import org.springframework.transaction.annotation.Transactional;
 public class InvestorService {
     private final InvestorRepository investorRepository;
     private final UserRepository userRepository;
+    private final UserFinder userFinder;
     @Transactional
     public InvestorProfileCreateResponse createInvestorProfile(Long userId, InvestorProfileCreateRequest request){
-        User owner = userRepository.findById(userId)
-            .orElseThrow(()-> new CustomException(ErrorCode.USER_NOT_FOUND));
+        User owner = userFinder.findByUserId(userId);
 
         if(investorRepository.existsByOwner(owner)){
             throw new CustomException(ErrorCode.PROFILE_ALREADY_EXISTS);
