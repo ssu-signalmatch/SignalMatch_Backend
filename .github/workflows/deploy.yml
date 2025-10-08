@@ -42,8 +42,8 @@ jobs:
       - name: Docker build and push
         run: |
           echo "${{ secrets.DOCKER_PASSWORD }}" | docker login -u "${{ secrets.DOCKER_USERNAME }}" --password-stdin
-          docker build -t crewing-spring .
-          docker tag crewing-spring ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${GITHUB_SHA::7}
+          docker build -t signalmatch-spring .
+          docker tag signalmatch-spring ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${GITHUB_SHA::7}
           docker push ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${GITHUB_SHA::7}
 
       # EC2에서 컨테이너 실행
@@ -59,14 +59,14 @@ jobs:
 
             # 최신 이미지 pull 및 태깅
             sudo docker pull ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${GITHUB_SHA::7}
-            sudo docker tag ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${GITHUB_SHA::7} crewing-spring
+            sudo docker tag ${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }}:${GITHUB_SHA::7} signalmatch-spring
 
             # 기존 컨테이너 종료 및 삭제
-            sudo docker stop crewing-spring || true
-            sudo docker rm crewing-spring || true
+            sudo docker stop signalmatch-spring || true
+            sudo docker rm signalmatch-spring || true
 
             # 새 컨테이너 실행
-            sudo docker run -d --name crewing-spring -p 80:8080 crewing-spring
+            sudo docker run -d --name signalmatch-spring -p 80:8080 signalmatch-spring
 
             # 이전 이미지 정리
             CURRENT_IMAGE_ID=$(sudo docker images --format "{{.Repository}} {{.Tag}} {{.ID}}" | grep "${{ secrets.DOCKER_USERNAME }}/${{ secrets.DOCKER_REPOSITORY }} ${GITHUB_SHA::7}" | awk '{print $3}')
