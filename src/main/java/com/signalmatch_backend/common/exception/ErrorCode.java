@@ -20,8 +20,8 @@ public enum ErrorCode {
 	USER_NOT_FOUND(HttpStatus.NOT_FOUND, "사용자의 정보를 찾을 수 없습니다."),
 	LOGINID_ALREADY_USED(HttpStatus.BAD_REQUEST,"이미 존재하는 아이디입니다."),
 	PASSWORD_NOT_MATCH(HttpStatus.BAD_REQUEST,"비밀번호가 일치하지 않습니다"),
-	PASSWORD_ALREADY_USED(HttpStatus.BAD_REQUEST,"사용중인 비밀번호 입니다."),
-	PROFILE_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 프로필이 존재합니다.");
+	PASSWORD_ALREADY_USED(HttpStatus.BAD_REQUEST,"사용중인 비밀번호 입니다.");
+
     private final HttpStatus status;
 	private final String message;
 
