@@ -1,19 +1,25 @@
 package com.signalmatch_backend.investor.service;
 
+import com.signalmatch_backend.BusinessArea.domain.BusinessArea;
+import com.signalmatch_backend.BusinessArea.repository.BusinessAreaRepository;
 import com.signalmatch_backend.common.exception.CustomException;
 import com.signalmatch_backend.common.exception.ErrorCode;
 import com.signalmatch_backend.investor.domain.Investor;
+import com.signalmatch_backend.investor.domain.InvestorPreferredArea;
 import com.signalmatch_backend.investor.domain.InvestorPreferredStage;
 import com.signalmatch_backend.investor.domain.enums.InvestmentSize;
 import com.signalmatch_backend.investor.domain.enums.InvestorType;
 import com.signalmatch_backend.investor.domain.enums.StageCode;
+import com.signalmatch_backend.investor.domain.key.InvestorPreferredAreaKey;
 import com.signalmatch_backend.investor.domain.key.InvestorPreferredStageKey;
 import com.signalmatch_backend.investor.dto.InvestorProfileCreateRequest;
 import com.signalmatch_backend.investor.dto.InvestorProfileCreateResponse;
+import com.signalmatch_backend.investor.repository.InvestorPreferredAreaRepository;
 import com.signalmatch_backend.investor.repository.InvestorRepository;
 import com.signalmatch_backend.user.UserFinder;
 import com.signalmatch_backend.user.domain.User;
 import com.signalmatch_backend.user.repository.UserRepository;
+import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -22,8 +28,9 @@ import org.springframework.transaction.annotation.Transactional;
 @RequiredArgsConstructor
 public class InvestorService {
     private final InvestorRepository investorRepository;
-    private final UserRepository userRepository;
     private final UserFinder userFinder;
+    private final BusinessAreaRepository businessAreaRepository;
+    private final InvestorPreferredAreaRepository investorPreferredAreaRepository;
     @Transactional
     public InvestorProfileCreateResponse createInvestorProfile(Long userId, InvestorProfileCreateRequest request){
         User owner = userFinder.findByUserId(userId);
@@ -57,6 +64,20 @@ public class InvestorService {
         });
 
         Investor savedInvestor = investorRepository.save(newInvestor);
+
+        List<BusinessArea> businessAreas = businessAreaRepository.findAllByNameIn(
+            request.preferredAreas());
+
+        List<InvestorPreferredArea> preferredAreas = businessAreas.stream()
+            .map(area -> InvestorPreferredArea.builder()
+                .id(new InvestorPreferredAreaKey(savedInvestor.getInvestorId(), area.getId()))
+                .investor(savedInvestor)
+                .businessArea(area)
+                .build())
+            .toList();
+
+        investorPreferredAreaRepository.saveAll(preferredAreas);
+
         return new InvestorProfileCreateResponse(savedInvestor.getInvestorId());
         
     }

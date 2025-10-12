@@ -28,6 +28,9 @@ public record InvestorProfileCreateRequest(
     @Schema(description = "투자희망규모")
     String preferredInvestmentSize,
     @Schema(description = "투자단계")
-    List<String> preferredStages
+    List<String> preferredStages,
+
+    @Schema(description = "선호 산업분야")
+    List<String> preferredAreas
 ){
 }

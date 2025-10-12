@@ -1,0 +1,9 @@
+package com.signalmatch_backend.investor.repository;
+
+import com.signalmatch_backend.investor.domain.InvestorPreferredArea;
+import com.signalmatch_backend.investor.domain.key.InvestorPreferredAreaKey;
+import org.springframework.data.jpa.repository.JpaRepository;
+
+public interface InvestorPreferredAreaRepository extends JpaRepository<InvestorPreferredArea, InvestorPreferredAreaKey> {
+
+}
