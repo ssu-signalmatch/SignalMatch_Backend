@@ -14,7 +14,9 @@ import com.signalmatch_backend.investor.domain.key.InvestorPreferredAreaKey;
 import com.signalmatch_backend.investor.domain.key.InvestorPreferredStageKey;
 import com.signalmatch_backend.investor.dto.InvestorProfileCreateRequest;
 import com.signalmatch_backend.investor.dto.InvestorProfileCreateResponse;
+import com.signalmatch_backend.investor.dto.InvestorProfileUpdateRequest;
 import com.signalmatch_backend.investor.repository.InvestorPreferredAreaRepository;
+import com.signalmatch_backend.investor.repository.InvestorPreferredStageRepository;
 import com.signalmatch_backend.investor.repository.InvestorRepository;
 import com.signalmatch_backend.user.UserFinder;
 import com.signalmatch_backend.user.domain.User;
@@ -31,6 +33,7 @@ public class InvestorService {
     private final UserFinder userFinder;
     private final BusinessAreaRepository businessAreaRepository;
     private final InvestorPreferredAreaRepository investorPreferredAreaRepository;
+    private final InvestorPreferredStageRepository investorPreferredStageRepository;
     @Transactional
     public InvestorProfileCreateResponse createInvestorProfile(Long userId, InvestorProfileCreateRequest request){
         User owner = userFinder.findByUserId(userId);
@@ -80,5 +83,44 @@ public class InvestorService {
 
         return new InvestorProfileCreateResponse(savedInvestor.getInvestorId());
         
+    }
+    @Transactional
+    public void updateInvestorProfile(Long userId, InvestorProfileUpdateRequest request){
+        User owner = userFinder.findByUserId(userId);
+        Investor investor = investorRepository.findByOwner(owner);
+        investor.update(request);
+        updatePreferredStages(investor,request.preferredStages());
+        updatePreferredAreas(investor,request.preferredAreas());
+    }
+
+    private void updatePreferredAreas(Investor investor, List<String> areas) {
+        investorPreferredAreaRepository.deleteAllByInvestor_InvestorId(investor.getInvestorId());
+
+        List<BusinessArea> businessAreas = businessAreaRepository.findAllByNameIn(areas);
+
+        List<InvestorPreferredArea> preferredAreas = businessAreas.stream()
+            .map(area -> InvestorPreferredArea.builder()
+                .id(new InvestorPreferredAreaKey(investor.getInvestorId(), area.getId()))
+                .investor(investor)
+                .businessArea(area)
+                .build())
+            .toList();
+
+        investorPreferredAreaRepository.saveAll(preferredAreas);
+    }
+
+    private void updatePreferredStages(Investor investor, List<String> stages) {
+        investorPreferredStageRepository.deleteAllByInvestor_InvestorId(investor.getInvestorId());
+
+        List<InvestorPreferredStage> newPreferredStages = stages.stream()
+            .map(stageString -> {
+                StageCode stageEnum = StageCode.valueOf(stageString.toUpperCase());
+                return InvestorPreferredStage.builder()
+                    .id(new InvestorPreferredStageKey(investor.getInvestorId(), stageEnum))
+                    .investor(investor)
+                    .build();
+            })
+            .toList();
+        investorPreferredStageRepository.saveAll(newPreferredStages);
     }
 }
