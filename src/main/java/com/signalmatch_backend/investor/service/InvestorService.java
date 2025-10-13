@@ -89,8 +89,13 @@ public class InvestorService {
         User owner = userFinder.findByUserId(userId);
         Investor investor = investorRepository.findByOwner(owner);
         investor.update(request);
-        updatePreferredStages(investor,request.preferredStages());
-        updatePreferredAreas(investor,request.preferredAreas());
+        if(request.preferredStages() != null){
+            updatePreferredStages(investor,request.preferredStages());
+        }
+        if(request.preferredAreas() != null){
+            updatePreferredAreas(investor,request.preferredAreas());
+        }
+
     }
 
     private void updatePreferredAreas(Investor investor, List<String> areas) {
