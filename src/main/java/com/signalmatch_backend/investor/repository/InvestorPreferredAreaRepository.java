@@ -5,5 +5,5 @@ import com.signalmatch_backend.investor.domain.key.InvestorPreferredAreaKey;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface InvestorPreferredAreaRepository extends JpaRepository<InvestorPreferredArea, InvestorPreferredAreaKey> {
-
+    void deleteAllByInvestor_InvestorId(Long investorId);
 }

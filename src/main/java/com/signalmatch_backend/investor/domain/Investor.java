@@ -4,6 +4,7 @@ package com.signalmatch_backend.investor.domain;
 import com.signalmatch_backend.common.domain.BaseEntity;
 import com.signalmatch_backend.investor.domain.enums.InvestmentSize;
 import com.signalmatch_backend.investor.domain.enums.InvestorType;
+import com.signalmatch_backend.investor.dto.InvestorProfileUpdateRequest;
 import com.signalmatch_backend.user.domain.User;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
@@ -64,4 +65,34 @@ public class Investor extends BaseEntity {
         preferredStages.add(stage);
         stage.setInvestor(this);
     }
+    public void update(InvestorProfileUpdateRequest request){
+        if(request.investorName() !=null){
+            this.investorName = request.investorName();
+        }
+        if(request.contactEmail() != null){
+            this.contactEmail= request.contactEmail();
+        }
+        if(request.position() != null ){
+            this.position = request.position();
+        }
+        if(request.phoneNumber() != null ){
+            this.phoneNumber = request.phoneNumber();
+        }
+        if(request.websiteUrl() != null ){
+            this.websiteUrl = request.websiteUrl();
+        }
+        if(request.intro() != null ){
+            this.intro = request.intro();
+        }
+        if(request.organizationName() != null ){
+            this.organizationName = request.organizationName();
+        }
+        if(request.preferredInvestmentSize() != null){
+            this.preferredInvestmentSize = InvestmentSize.valueOf(request.preferredInvestmentSize());
+        }
+        if(request.investorType() != null){
+            this.investorType= InvestorType.valueOf(request.investorType());
+        }
+    }
+
 }
