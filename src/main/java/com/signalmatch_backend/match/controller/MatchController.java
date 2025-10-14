@@ -26,7 +26,20 @@ public class MatchController {
     public ResponseEntity<ApiResponse<Long>> createMatch(
             @AuthenticationPrincipal CustomUserDetails customUserDetails,
             @RequestBody MatchCreateRequest matchCreateRequest) {
-        Long matchId = matchService.createMatch(matchCreateRequest.investorId(), matchCreateRequest.startupId());
+        Long userId = customUserDetails.getUser().getUserId();
+        Long matchId = matchService.createMatch(userId, matchCreateRequest.investorId(), matchCreateRequest.startupId());
         return ResponseEntity.ok(ApiResponse.success("매칭이 생성되었습니다.", matchId));
+    }
+
+    @PostMapping("/{matchId}/accept")
+    @Operation(summary = "매칭 수락하기", description = "요청된 매칭을 수락하는 API 입니다.")
+    public ResponseEntity<ApiResponse<Void>> acceptMatch(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable Long matchId
+    ){
+        Long userId = customUserDetails.getUser().getUserId();
+        matchService.acceptMatch(userId, matchId);
+        return ResponseEntity.ok(ApiResponse.success("매칭이 수락되었습니다."));
+
     }
 }

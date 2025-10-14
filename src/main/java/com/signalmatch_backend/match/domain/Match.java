@@ -29,10 +29,14 @@ public class Match extends BaseEntity {
     @Column(nullable = false, length = 20)
     private MatchStatus status;
 
-    @Column()
+    @Column
     private LocalDateTime matchedAt;
 
     public void setStatus(MatchStatus status) {
         this.status = status;
+    }
+
+    public void setMatchedAt(LocalDateTime matchedAt) {
+        this.matchedAt = matchedAt;
     }
 }
