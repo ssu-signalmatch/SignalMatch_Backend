@@ -1,7 +1,9 @@
 package com.signalmatch_backend.match.dto;
 
+import jakarta.validation.constraints.NotNull;
+
 public record MatchCreateRequest(
-        Long investorId,
-        Long startupId
+        @NotNull Long investorId,
+        @NotNull Long startupId
 ) {
 }
