@@ -2,8 +2,10 @@ package com.signalmatch_backend.match.controller;
 
 
 import com.signalmatch_backend.common.domain.ApiResponse;
+import com.signalmatch_backend.match.dto.CancelRequest;
 import com.signalmatch_backend.match.dto.MatchCreateRequest;
 import com.signalmatch_backend.match.dto.MatchRequestedEvent;
+import com.signalmatch_backend.match.dto.RejectRequest;
 import com.signalmatch_backend.match.service.MatchService;
 import com.signalmatch_backend.user.jwt.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -41,5 +43,39 @@ public class MatchController {
         matchService.acceptMatch(userId, matchId);
         return ResponseEntity.ok(ApiResponse.success("매칭이 수락되었습니다."));
 
+    }
+
+    @PostMapping("/{matchId}/reject")
+    @Operation(summary = "매칭 거부하기", description = "요청된 매칭을 거부하는 API 입니다.")
+    public ResponseEntity<ApiResponse<Void>> rejectMatch(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable Long matchId,
+            @RequestBody(required = false) RejectRequest body
+    ){
+        Long userId = customUserDetails.getUser().getUserId();
+        matchService.rejectMatch(
+                userId,
+                matchId,
+                body == null ? null : body.reasonCode(),
+                body == null ? null : body.reasonText()
+        );
+        return ResponseEntity.ok(ApiResponse.success("매칭이 거부되었습니다."));
+    }
+
+    @PostMapping("/{matchId}/cancel")
+    @Operation(summary = "매칭 해제하기", description = "매칭을 해제하는 API 입니다.")
+    public ResponseEntity<ApiResponse<Void>> cancelMatch(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable Long matchId,
+            @RequestBody(required = false)CancelRequest body
+            ){
+        Long userId = customUserDetails.getUser().getUserId();
+        matchService.cancelMatch(
+                userId,
+                matchId,
+                body == null ? null : body.reasonCode(),
+                body == null ? null : body.reasonText()
+        );
+        return ResponseEntity.ok(ApiResponse.success("매칭이 해제되었습니다."));
     }
 }
