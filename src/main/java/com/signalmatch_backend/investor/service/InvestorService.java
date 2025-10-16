@@ -21,11 +21,8 @@ import com.signalmatch_backend.investor.repository.InvestorPreferredAreaReposito
 import com.signalmatch_backend.investor.repository.InvestorPreferredStageRepository;
 import com.signalmatch_backend.investor.repository.InvestorRepository;
 import com.signalmatch_backend.user.UserFinder;
-import com.signalmatch_backend.investor.InvestorFinder;
 import com.signalmatch_backend.user.domain.User;
-import com.signalmatch_backend.user.repository.UserRepository;
 import java.util.List;
-import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
