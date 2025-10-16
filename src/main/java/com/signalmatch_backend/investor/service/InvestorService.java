@@ -21,6 +21,7 @@ import com.signalmatch_backend.investor.repository.InvestorPreferredAreaReposito
 import com.signalmatch_backend.investor.repository.InvestorPreferredStageRepository;
 import com.signalmatch_backend.investor.repository.InvestorRepository;
 import com.signalmatch_backend.user.UserFinder;
+import com.signalmatch_backend.investor.InvestorFinder;
 import com.signalmatch_backend.user.domain.User;
 import com.signalmatch_backend.user.repository.UserRepository;
 import java.util.List;
@@ -37,6 +38,7 @@ public class InvestorService {
     private final BusinessAreaRepository businessAreaRepository;
     private final InvestorPreferredAreaRepository investorPreferredAreaRepository;
     private final InvestorPreferredStageRepository investorPreferredStageRepository;
+    private final InvestorFinder investorFinder;
     @Transactional
     public InvestorProfileCreateResponse createInvestorProfile(Long userId, InvestorProfileCreateRequest request){
         User owner = userFinder.findByUserId(userId);
@@ -131,14 +133,10 @@ public class InvestorService {
             .toList();
         investorPreferredStageRepository.saveAll(newPreferredStages);
     }
-    @Transactional
+    
     public InvestorProfileInfo findInvestorProfile(Long userId){
         User owner= userFinder.findByUserId(userId);
-
-        Investor investor = investorRepository.findByOwner(owner);
-        if(investor ==null){
-            throw new CustomException(ErrorCode.INVESTOR_NOT_FOUND);
-        }
+        Investor investor = investorFinder.findByOwner(owner);
 
         List<InvestorPreferredArea> investorPreferredAreaList= investorPreferredAreaRepository.findByInvestor(investor);
 
