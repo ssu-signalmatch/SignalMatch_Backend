@@ -39,4 +39,24 @@ public class MatchEventConsumer {
             log.info("Match {} -> {}", match.getMatchId(), match.getStatus());
         });
     }
+
+    @KafkaHandler
+    public void onRejected(MatchRequestedEvent event){
+        log.info("[match.events] rejected: {}", event);
+        matchRepository.findById(event.matchId()).ifPresent(match -> {
+            match.setStatus(MatchStatus.valueOf(event.status())); // ACCEPTED
+            matchRepository.save(match);
+            log.info("Match {} -> {}", match.getMatchId(), match.getStatus());
+        });
+    }
+
+    @KafkaHandler
+    public void onCanceled(MatchRequestedEvent event){
+        log.info("[match.events] rejected: {}", event);
+        matchRepository.findById(event.matchId()).ifPresent(match -> {
+            match.setStatus(MatchStatus.valueOf(event.status())); // ACCEPTED
+            matchRepository.save(match);
+            log.info("Match {} -> {}", match.getMatchId(), match.getStatus());
+        });
+    }
 }

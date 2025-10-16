@@ -2,6 +2,8 @@ package com.signalmatch_backend.match.service;
 
 import com.signalmatch_backend.match.config.KafkaTopicsConfig;
 import com.signalmatch_backend.match.dto.MatchAcceptedEvent;
+import com.signalmatch_backend.match.dto.MatchCanceledEvent;
+import com.signalmatch_backend.match.dto.MatchRejectedEvent;
 import com.signalmatch_backend.match.dto.MatchRequestedEvent;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
@@ -21,11 +23,19 @@ public class MatchEventPublisher {
     private boolean kafkaEnabled;
 
     public void publishMatchRequested(MatchRequestedEvent event) {
-        publish(KafkaTopicsConfig.MATCH_EVENTS, event.investorId(), event);
+        publish(KafkaTopicsConfig.MATCH_EVENTS, event.matchId(), event);
     }
 
     public void publishMatchAccepted(MatchAcceptedEvent event) {
-        publish(KafkaTopicsConfig.MATCH_EVENTS, event.investorId(), event);
+        publish(KafkaTopicsConfig.MATCH_EVENTS, event.matchId(), event);
+    }
+
+    public void publishMatchRejected(MatchRejectedEvent event) {
+        publish(KafkaTopicsConfig.MATCH_EVENTS, event.matchId(),event);
+    }
+
+    public void publishMatchCanceled(MatchCanceledEvent event) {
+        publish(KafkaTopicsConfig.MATCH_EVENTS, event.matchId(),event);
     }
 
     // 공통 로직 분리
