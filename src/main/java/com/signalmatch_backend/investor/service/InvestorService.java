@@ -4,6 +4,7 @@ import com.signalmatch_backend.BusinessArea.domain.BusinessArea;
 import com.signalmatch_backend.BusinessArea.repository.BusinessAreaRepository;
 import com.signalmatch_backend.common.exception.CustomException;
 import com.signalmatch_backend.common.exception.ErrorCode;
+import com.signalmatch_backend.investor.InvestorFinder;
 import com.signalmatch_backend.investor.domain.Investor;
 import com.signalmatch_backend.investor.domain.InvestorPreferredArea;
 import com.signalmatch_backend.investor.domain.InvestorPreferredStage;
@@ -14,6 +15,7 @@ import com.signalmatch_backend.investor.domain.key.InvestorPreferredAreaKey;
 import com.signalmatch_backend.investor.domain.key.InvestorPreferredStageKey;
 import com.signalmatch_backend.investor.dto.InvestorProfileCreateRequest;
 import com.signalmatch_backend.investor.dto.InvestorProfileCreateResponse;
+import com.signalmatch_backend.investor.dto.InvestorProfileInfo;
 import com.signalmatch_backend.investor.dto.InvestorProfileUpdateRequest;
 import com.signalmatch_backend.investor.repository.InvestorPreferredAreaRepository;
 import com.signalmatch_backend.investor.repository.InvestorPreferredStageRepository;
@@ -22,6 +24,7 @@ import com.signalmatch_backend.user.UserFinder;
 import com.signalmatch_backend.user.domain.User;
 import com.signalmatch_backend.user.repository.UserRepository;
 import java.util.List;
+import java.util.stream.Collectors;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -127,5 +130,22 @@ public class InvestorService {
             })
             .toList();
         investorPreferredStageRepository.saveAll(newPreferredStages);
+    }
+    @Transactional
+    public InvestorProfileInfo findInvestorProfile(Long userId){
+        User owner= userFinder.findByUserId(userId);
+
+        Investor investor = investorRepository.findByOwner(owner);
+        if(investor ==null){
+            throw new CustomException(ErrorCode.INVESTOR_NOT_FOUND);
+        }
+
+        List<InvestorPreferredArea> investorPreferredAreaList= investorPreferredAreaRepository.findByInvestor(investor);
+
+        List<String> investorPreferredAreaNames = investorPreferredAreaList.stream()
+            .map(area -> area.getBusinessArea().getName())
+            .toList();
+
+        return  InvestorProfileInfo.toInvestorProfileInfo(investor, investorPreferredAreaNames);
     }
 }
