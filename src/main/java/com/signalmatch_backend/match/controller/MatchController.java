@@ -2,18 +2,18 @@ package com.signalmatch_backend.match.controller;
 
 
 import com.signalmatch_backend.common.domain.ApiResponse;
-import com.signalmatch_backend.match.dto.CancelRequest;
-import com.signalmatch_backend.match.dto.MatchCreateRequest;
-import com.signalmatch_backend.match.dto.MatchRequestedEvent;
-import com.signalmatch_backend.match.dto.RejectRequest;
+import com.signalmatch_backend.match.dto.*;
 import com.signalmatch_backend.match.service.MatchService;
 import com.signalmatch_backend.user.jwt.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
 import lombok.RequiredArgsConstructor;
+import org.apache.kafka.shaded.com.google.protobuf.Api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
 import org.springframework.web.bind.annotation.*;
+
+import java.util.List;
 
 @RestController
 @RequiredArgsConstructor
@@ -78,4 +78,16 @@ public class MatchController {
         );
         return ResponseEntity.ok(ApiResponse.success("매칭이 해제되었습니다."));
     }
+
+
+    @GetMapping
+    @Operation(summary = "매칭 목록 조회", description = "해당 유저의 매칭 목록을 조회하는 API 입니다.")
+    public ResponseEntity<ApiResponse<List<MatchResponse>>> getMyMatches(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails
+    ){
+        Long userId = customUserDetails.getUser().getUserId();
+        List<MatchResponse> response = matchService.getMyMatches(userId);
+        return ResponseEntity.ok(ApiResponse.success("매칭 목록이 조회되었습니다.",response));
+    }
+
 }

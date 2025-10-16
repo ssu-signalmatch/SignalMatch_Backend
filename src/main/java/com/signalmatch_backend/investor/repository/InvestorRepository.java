@@ -8,6 +8,5 @@ import java.util.Optional;
 
 public interface InvestorRepository extends JpaRepository<Investor,Long> {
     boolean existsByOwner(User owner);
-    Investor findByOwner(User owner);
-    Optional<Investor> findByOwner_UserId(Long userId);
+    Optional<Investor> findByOwner(User owner);
 }
