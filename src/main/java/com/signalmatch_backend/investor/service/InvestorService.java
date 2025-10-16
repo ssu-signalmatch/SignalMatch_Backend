@@ -87,7 +87,7 @@ public class InvestorService {
     @Transactional
     public void updateInvestorProfile(Long userId, InvestorProfileUpdateRequest request){
         User owner = userFinder.findByUserId(userId);
-        Investor investor = investorRepository.findByOwner(owner);
+        Investor investor = investorRepository.findByOwner(owner).orElseThrow(() -> new CustomException(ErrorCode.INVESTOR_NOT_FOUND));
         investor.update(request);
         if(request.preferredStages() != null){
             updatePreferredStages(investor,request.preferredStages());

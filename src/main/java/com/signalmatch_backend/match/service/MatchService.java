@@ -8,10 +8,7 @@ import com.signalmatch_backend.match.MatchFinder;
 import com.signalmatch_backend.match.domain.Match;
 import com.signalmatch_backend.match.domain.enums.MatchReasonCode;
 import com.signalmatch_backend.match.domain.enums.MatchStatus;
-import com.signalmatch_backend.match.dto.MatchAcceptedEvent;
-import com.signalmatch_backend.match.dto.MatchCanceledEvent;
-import com.signalmatch_backend.match.dto.MatchRejectedEvent;
-import com.signalmatch_backend.match.dto.MatchRequestedEvent;
+import com.signalmatch_backend.match.dto.*;
 import com.signalmatch_backend.match.repository.MatchRepository;
 import com.signalmatch_backend.startup.StartupFinder;
 import com.signalmatch_backend.startup.domain.Startup;
@@ -212,4 +209,25 @@ public class MatchService {
     }
 
 
+    public List<MatchResponse> getMyMatches(Long userId) {
+        User user = userFinder.findByUserId(userId);
+
+        if (user.getUserRole() == UserRole.STARTUP) {
+            Startup startup = startupFinder.findByOwner(user);
+            List<Match> matches= matchRepository.findAllByStartupId(startup.getStartupId());
+            return matches.stream()
+                    .map(MatchResponse::from)
+                    .toList();
+
+        } else if (user.getUserRole() == UserRole.INVESTOR) {
+            Investor investor = investorFinder.findByOwner(user);
+            List<Match> matches = matchRepository.findAllByInvestorId(investor.getInvestorId());
+            return matches.stream()
+                    .map(MatchResponse::from)
+                    .toList();
+        } else {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
+
+    }
 }
