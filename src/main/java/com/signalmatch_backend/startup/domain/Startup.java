@@ -31,4 +31,18 @@ public class Startup extends BaseEntity {
     @Column(nullable = false)
     private long views; //조회 수
 
+    @OneToOne(mappedBy = "startup", cascade = CascadeType.ALL, orphanRemoval = true)
+    private StartupFinance startupFinance;
+
+    @OneToOne(mappedBy = "startup", cascade = CascadeType.ALL, orphanRemoval = true)
+    private StartupProfile startupProfile;
+
+    public void addStartupFinance(StartupFinance startupFinance){
+        this.startupFinance = startupFinance;
+        startupFinance.setStartup(this);
+    }
+    public void addStartupProfile(StartupProfile startupProfile){
+        this.startupProfile = startupProfile;
+        startupProfile.setStartup(this);
+    }
 }
