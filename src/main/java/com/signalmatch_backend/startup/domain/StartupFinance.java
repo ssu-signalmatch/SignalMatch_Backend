@@ -17,7 +17,7 @@ public class StartupFinance {
     @Id
     @Column(name = "startup_id")
     private Long id; // startups.startup_id와 동일
-
+    @Setter
     @OneToOne(fetch = FetchType.LAZY)
     @MapsId
     @JoinColumn(name = "startup_id")

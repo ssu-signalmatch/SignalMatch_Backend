@@ -9,4 +9,5 @@ import java.util.Optional;
 
 public interface StartupRepository extends JpaRepository<Startup, Long> {
     Optional<Startup> findByOwner(User user);
+    boolean existsByOwner(User owner);
 }
