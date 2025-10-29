@@ -6,5 +6,5 @@ import java.util.List;
 import org.springframework.data.jpa.repository.JpaRepository;
 
 public interface StartupBusinessAreaRepository extends JpaRepository<StartupBusinessArea, StartupBusinessAreaKey> {
-
+    void deleteAllByStartup_StartupId(Long startupId);
 }

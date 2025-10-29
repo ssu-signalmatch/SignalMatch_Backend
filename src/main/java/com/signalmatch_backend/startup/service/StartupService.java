@@ -14,6 +14,7 @@ import com.signalmatch_backend.startup.domain.enums.ScaleType;
 import com.signalmatch_backend.startup.domain.enums.StartupStatus;
 import com.signalmatch_backend.startup.domain.key.StartupBusinessAreaKey;
 import com.signalmatch_backend.startup.dto.StartupProfileCreateRequest;
+import com.signalmatch_backend.startup.dto.StartupProfileUpdateRequest;
 import com.signalmatch_backend.startup.repository.StartupBusinessAreaRepository;
 import com.signalmatch_backend.startup.repository.StartupRepository;
 import com.signalmatch_backend.user.UserFinder;
@@ -85,5 +86,33 @@ public class StartupService {
         startupBusinessAreaRepository.saveAll(businessAreaList);
 
 
+    }
+    @Transactional
+    public void updateStartupProfile(Long userId, StartupProfileUpdateRequest request){
+        User owner = userFinder.findByUserId(userId);
+        Startup startup = startupRepository.findByOwner(owner)
+            .orElseThrow(() -> new CustomException(ErrorCode.STARTUP_NOT_FOUND));
+        startup.update(request);
+        startup.getStartupFinance().update(request);
+        startup.getStartupProfile().update(request);
+        if(request.businessAreas() != null){
+            updateBusinessAreas(startup,request.businessAreas());
+        }
+
+    }
+
+    private void updateBusinessAreas(Startup startup, List<String> areas) {
+
+        startupBusinessAreaRepository.deleteAllByStartup_StartupId(startup.getStartupId());
+        List<BusinessArea> businessAreas = businessAreaRepository.findAllByNameIn(areas);
+
+        List<StartupBusinessArea> businessAreaList = businessAreas.stream()
+            .map(area -> StartupBusinessArea.builder()
+                .id(new StartupBusinessAreaKey(startup.getStartupId(), area.getId()))
+                .startup(startup)
+                .businessArea(area)
+                .build())
+            .toList();
+        startupBusinessAreaRepository.saveAll(businessAreaList);
     }
 }
