@@ -4,9 +4,9 @@ import com.signalmatch_backend.investor.dto.InvestorProfileInfo;
 
 public record InvestorMyPageResponse(
         InvestorProfileInfo profile,
-        int matchedStartupCount
+        long matchedStartupCount
 ) implements MyPageResponse{
-    public static InvestorMyPageResponse of(InvestorProfileInfo profile, int matchedCount) {
+    public static InvestorMyPageResponse of(InvestorProfileInfo profile, long matchedCount) {
         return new InvestorMyPageResponse(profile, matchedCount);
     }
 
