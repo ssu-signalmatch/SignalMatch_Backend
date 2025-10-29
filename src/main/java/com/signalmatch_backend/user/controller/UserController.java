@@ -3,6 +3,7 @@ package com.signalmatch_backend.user.controller;
 import com.signalmatch_backend.common.domain.ApiResponse;
 import com.signalmatch_backend.user.dto.LoginRequest;
 import com.signalmatch_backend.user.dto.LoginResponse;
+import com.signalmatch_backend.user.dto.MyPageResponse;
 import com.signalmatch_backend.user.dto.SignupRequest;
 import com.signalmatch_backend.user.jwt.CustomUserDetails;
 import com.signalmatch_backend.user.service.UserService;
@@ -40,5 +41,13 @@ public class UserController {
         Long userId = customUserDetails.getUser().getUserId();
         userService.delete(userId);
         return ResponseEntity.ok(ApiResponse.success("회원이 삭제되었습니다."));
+    }
+
+    @GetMapping("/me")
+    @Operation(summary = "마이페이지", description = "회원의 정보를 조회하는 API입니다.")
+    public ResponseEntity<ApiResponse<MyPageResponse>> getMyPage(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
+        Long userId = customUserDetails.getUser().getUserId();
+        MyPageResponse myPageResponse = userService.getMyPage(userId);
+        return ResponseEntity.ok(ApiResponse.success("회원정보가 조회되었습니다.",myPageResponse));
     }
 }

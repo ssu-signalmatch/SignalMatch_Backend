@@ -6,6 +6,7 @@ import com.signalmatch_backend.user.UserFinder;
 import com.signalmatch_backend.user.domain.User;
 import com.signalmatch_backend.user.dto.LoginRequest;
 import com.signalmatch_backend.user.dto.LoginResponse;
+import com.signalmatch_backend.user.dto.MyPageResponse;
 import com.signalmatch_backend.user.dto.SignupRequest;
 import com.signalmatch_backend.user.jwt.JwtUtil;
 import com.signalmatch_backend.user.repository.UserRepository;
@@ -52,4 +53,9 @@ public class UserService {
         User user = userFinder.findByUserId(userId);
         userRepository.delete(user);
     }
+
+//    public MyPageResponse getMyPage(Long userId) {
+//        User user = userFinder.findByUserId(userId);
+//
+//    }
 }
