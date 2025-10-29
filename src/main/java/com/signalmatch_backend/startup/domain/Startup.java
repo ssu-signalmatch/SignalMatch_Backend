@@ -2,6 +2,7 @@ package com.signalmatch_backend.startup.domain;
 
 import com.signalmatch_backend.common.domain.BaseEntity;
 import com.signalmatch_backend.startup.domain.enums.StartupStatus;
+import com.signalmatch_backend.startup.dto.StartupProfileUpdateRequest;
 import com.signalmatch_backend.user.domain.User;
 import jakarta.persistence.*;
 import lombok.*;
@@ -44,5 +45,13 @@ public class Startup extends BaseEntity {
     public void addStartupProfile(StartupProfile startupProfile){
         this.startupProfile = startupProfile;
         startupProfile.setStartup(this);
+    }
+    public void update(StartupProfileUpdateRequest request){
+        if(request.startupName() != null){
+            this.startupName =request.startupName();
+        }
+        if(request.status() != null){
+            this.status = StartupStatus.valueOf(request.status());
+        }
     }
 }

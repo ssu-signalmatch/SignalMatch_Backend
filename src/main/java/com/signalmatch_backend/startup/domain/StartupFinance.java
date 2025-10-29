@@ -1,6 +1,7 @@
 package com.signalmatch_backend.startup.domain;
 
 import com.signalmatch_backend.startup.domain.enums.FundingStage;
+import com.signalmatch_backend.startup.dto.StartupProfileUpdateRequest;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -31,5 +32,23 @@ public class StartupFinance {
     @Enumerated(EnumType.STRING)
     @Column(length = 20)
     private FundingStage investorStages; // 투자 단계
+    // StartupFinance.java
 
+    public void update(StartupProfileUpdateRequest request) {
+        if (request.revenue() != null) {
+            this.revenue = request.revenue();
+        }
+        if (request.profit() != null) {
+            this.profit = request.profit();
+        }
+        if (request.fundingRounds() != null) {
+            this.fundingRounds = request.fundingRounds();
+        }
+        if (request.totalFunding() != null) {
+            this.totalFunding = request.totalFunding();
+        }
+        if (request.investorStages() != null) {
+            this.investorStages = FundingStage.valueOf(request.investorStages().toUpperCase());
+        }
+    }
 }

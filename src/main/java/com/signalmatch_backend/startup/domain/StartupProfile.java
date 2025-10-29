@@ -2,6 +2,7 @@ package com.signalmatch_backend.startup.domain;
 
 import com.signalmatch_backend.startup.domain.enums.LegalType;
 import com.signalmatch_backend.startup.domain.enums.ScaleType;
+import com.signalmatch_backend.startup.dto.StartupProfileUpdateRequest;
 import jakarta.persistence.*;
 import jakarta.validation.constraints.Email;
 import lombok.*;
@@ -44,4 +45,38 @@ public class StartupProfile {
 
     @Enumerated(EnumType.STRING) @Column(length = 10)
     private ScaleType scale;
+    // StartupProfile.java
+
+    public void update(StartupProfileUpdateRequest request) {
+        if (request.foundingDate() != null) {
+            this.foundingDate = request.foundingDate();
+        }
+        if (request.address() != null) {
+            this.address = request.address();
+        }
+        if (request.homepageUrl() != null) {
+            this.homepageUrl = request.homepageUrl();
+        }
+        if (request.contactEmail() != null) {
+             this.contactEmail = request.contactEmail();
+        }
+        if (request.intro() != null ) {
+            this.intro = request.intro();
+        }
+        if (request.representativeName() != null) {
+            this.representativeName = request.representativeName();
+        }
+        if (request.businessNumber() != null ) {
+            this.businessNumber = request.businessNumber();
+        }
+        if (request.employeeCount() != null) {
+            this.employeeCount = request.employeeCount();
+        }
+        if (request.legalType() != null ) {
+            this.legalType = LegalType.valueOf(request.legalType().toUpperCase());
+        }
+        if (request.scale() != null ) {
+            this.scale = ScaleType.valueOf(request.scale().toUpperCase());
+        }
+    }
 }
