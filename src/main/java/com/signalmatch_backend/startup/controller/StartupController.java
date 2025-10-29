@@ -2,6 +2,7 @@ package com.signalmatch_backend.startup.controller;
 
 import com.signalmatch_backend.common.domain.ApiResponse;
 import com.signalmatch_backend.startup.dto.StartupProfileCreateRequest;
+import com.signalmatch_backend.startup.dto.StartupProfileInfo;
 import com.signalmatch_backend.startup.dto.StartupProfileUpdateRequest;
 import com.signalmatch_backend.startup.service.StartupService;
 import com.signalmatch_backend.user.jwt.CustomUserDetails;
@@ -11,7 +12,9 @@ import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PatchMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -37,5 +40,12 @@ public class StartupController {
         Long userId = customUserDetails.getUser().getUserId();
         startupService.updateStartupProfile(userId,request);
         return ResponseEntity.ok(ApiResponse.success("스타트업 프로필 수정이 완료되었습니다."));
+    }
+
+    @GetMapping("/startups/{userId}")
+    @Operation(summary = "스타트업 프로필 상세조회", description = "스타트업 프로필을 상세 조회 합니다.")
+    public ResponseEntity<ApiResponse<StartupProfileInfo>> findStartupProfile(@PathVariable Long userId){
+        StartupProfileInfo startupProfileInfo = startupService.findStartupProfile(userId);
+        return ResponseEntity.ok(ApiResponse.success("스타트업 프로필 상세조회가 완료되었습니다.",startupProfileInfo));
     }
 }

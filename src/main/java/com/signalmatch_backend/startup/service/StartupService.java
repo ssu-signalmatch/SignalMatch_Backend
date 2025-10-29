@@ -4,6 +4,7 @@ import com.signalmatch_backend.BusinessArea.domain.BusinessArea;
 import com.signalmatch_backend.BusinessArea.repository.BusinessAreaRepository;
 import com.signalmatch_backend.common.exception.CustomException;
 import com.signalmatch_backend.common.exception.ErrorCode;
+import com.signalmatch_backend.startup.StartupFinder;
 import com.signalmatch_backend.startup.domain.Startup;
 import com.signalmatch_backend.startup.domain.StartupBusinessArea;
 import com.signalmatch_backend.startup.domain.StartupFinance;
@@ -14,6 +15,7 @@ import com.signalmatch_backend.startup.domain.enums.ScaleType;
 import com.signalmatch_backend.startup.domain.enums.StartupStatus;
 import com.signalmatch_backend.startup.domain.key.StartupBusinessAreaKey;
 import com.signalmatch_backend.startup.dto.StartupProfileCreateRequest;
+import com.signalmatch_backend.startup.dto.StartupProfileInfo;
 import com.signalmatch_backend.startup.dto.StartupProfileUpdateRequest;
 import com.signalmatch_backend.startup.repository.StartupBusinessAreaRepository;
 import com.signalmatch_backend.startup.repository.StartupRepository;
@@ -21,6 +23,7 @@ import com.signalmatch_backend.user.UserFinder;
 import com.signalmatch_backend.user.domain.User;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
+import org.hibernate.sql.ast.tree.expression.Star;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -31,6 +34,7 @@ public class StartupService {
     private final StartupRepository startupRepository;
     private final BusinessAreaRepository businessAreaRepository;
     private final StartupBusinessAreaRepository startupBusinessAreaRepository;
+    private final StartupFinder startupFinder;
     @Transactional
     public void createStartupProfile(Long userId, StartupProfileCreateRequest request){
         User owner = userFinder.findByUserId(userId);
@@ -114,5 +118,17 @@ public class StartupService {
                 .build())
             .toList();
         startupBusinessAreaRepository.saveAll(businessAreaList);
+    }
+
+    public StartupProfileInfo findStartupProfile(Long userId) {
+        User owner = userFinder.findByUserId(userId);
+        Startup startup = startupFinder.findByOwner(owner);
+
+        List<StartupBusinessArea> startupBusinessAreaList = startupBusinessAreaRepository.findByStartup(startup);
+
+        List<String> startupBusinessAreaNames = startupBusinessAreaList.stream()
+            .map(area -> area.getBusinessArea().getName()).toList();
+
+        return  StartupProfileInfo.toStartupProfileInfo(startup,startupBusinessAreaNames);
     }
 }
