@@ -19,5 +19,5 @@ public class Document extends BaseEntity {
     private Long userId;
 
     @Column(nullable = false, length = 2048)
-    private String documentUrl;
+    private String objectKey;
 }
