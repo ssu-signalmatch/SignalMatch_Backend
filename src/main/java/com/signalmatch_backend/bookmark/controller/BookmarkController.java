@@ -11,6 +11,8 @@ import lombok.RequiredArgsConstructor;
 import org.apache.kafka.shaded.com.google.protobuf.Api;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.annotation.AuthenticationPrincipal;
+import org.springframework.web.bind.annotation.DeleteMapping;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.PostMapping;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -29,6 +31,14 @@ public class BookmarkController {
         Long userId = customUserDetails.getUser().getUserId();
         BookmarkResponse response = bookmarkService.addBookmark(userId, request);
         return ResponseEntity.ok(ApiResponse.success("즐겨찾기가 추가되었습니다.",response));
+    }
+
+    @DeleteMapping("/bookmarks/{targetUserId}")
+    @Operation(summary = "즐겨찾기 삭제" ,description = "로그인한 사용자가 투자자 또는 스타트업을 즐겨찾기에서 삭제합니다.")
+    public ResponseEntity<ApiResponse<Void>> bookmarkDelete(@AuthenticationPrincipal CustomUserDetails customUserDetails, @PathVariable Long targetUserId){
+        Long userId = customUserDetails.getUser().getUserId();
+        bookmarkService.deleteBookmark(userId, targetUserId);
+        return ResponseEntity.ok(ApiResponse.success("즐겨찾기가 삭제되었습니다."));
     }
 
 }

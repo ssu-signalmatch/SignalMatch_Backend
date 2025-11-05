@@ -19,6 +19,7 @@ public enum ErrorCode {
 	//Bookmark Error
 	BOOKMARK_ONLY_ONE_TARGET_ALLOWED(HttpStatus.BAD_REQUEST,"investorId 또는 startupId 중 하나만 값이 있어야 합니다."),
 	BOOKMARK_ALREADY_EXISTS(HttpStatus.CONFLICT, "이미 북마크가 존재합니다."),
+	BOOKMARK_NOT_FOUND(HttpStatus.NOT_FOUND,"북마크가 존재하지 않습니다."),
 	//Auth
 	ACCESS_DENIED(HttpStatus.FORBIDDEN, "접근 권한이 없습니다."),
 
