@@ -34,7 +34,17 @@ public enum ErrorCode {
 
 	//Matching Error
 	MATCH_ALREADY_USED(HttpStatus.BAD_REQUEST,"이미 진행 중인 매칭입니다."),
-	MATCH_NOT_FOUND(HttpStatus.NOT_FOUND, "매칭의 정보를 찾을 수 없습니다.");
+	MATCH_NOT_FOUND(HttpStatus.NOT_FOUND, "매칭의 정보를 찾을 수 없습니다."),
+
+	//File Error
+	INVALID_FILE_TYPE(HttpStatus.BAD_REQUEST, "허용되지 않은 파일 형식입니다."),
+	INVALID_MIME_TYPE(HttpStatus.BAD_REQUEST, "허용되지 않은 MIME 타입입니다."),
+	IMAGE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "이미지 파일 크기가 허용 범위를 초과했습니다."),
+	IR_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "IR 파일 크기가 허용 범위를 초과했습니다."),
+	PDF_ONLY(HttpStatus.BAD_REQUEST, "IR 파일은 PDF만 가능합니다."),
+	FILE_EXTENSION_REQUIRED(HttpStatus.BAD_REQUEST, "파일 확장자가 필요합니다.");
+
+
     private final HttpStatus status;
 	private final String message;
 
