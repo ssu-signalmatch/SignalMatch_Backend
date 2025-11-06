@@ -1,6 +1,7 @@
 package com.signalmatch_backend.bookmark.service;
 
 import com.signalmatch_backend.bookmark.domain.Bookmark;
+import com.signalmatch_backend.bookmark.dto.BookmarkListResponse;
 import com.signalmatch_backend.bookmark.dto.BookmarkRequest;
 import com.signalmatch_backend.bookmark.dto.BookmarkResponse;
 import com.signalmatch_backend.bookmark.repository.BookmarkRepository;
@@ -13,6 +14,7 @@ import com.signalmatch_backend.startup.repository.StartupRepository;
 import com.signalmatch_backend.user.UserFinder;
 import com.signalmatch_backend.user.domain.User;
 import com.signalmatch_backend.user.domain.enums.UserRole;
+import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -20,13 +22,14 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class BookmarkService {
 
     private final BookmarkRepository bookmarkRepository;
     private final UserFinder userFinder;
     private final InvestorRepository investorRepository;
     private final StartupRepository startupRepository;
-    @Transactional
+
     public BookmarkResponse addBookmark(Long userId, BookmarkRequest request){
         Long investorId = request.investorId();
         Long startupId = request.startupId();
@@ -46,6 +49,35 @@ public class BookmarkService {
         Bookmark savedBookmark = bookmarkRepository.save(bookmark);
 
         return new BookmarkResponse(savedBookmark.getBookmarkId(),savedBookmark.getInvestorId(),savedBookmark.getStartupId());
+    }
+
+    public List<BookmarkListResponse> getBookmarkList(Long userId){
+        List<Bookmark> bookmarks = bookmarkRepository.findByUserId(userId);
+
+        return bookmarks.stream().map(
+            bookmark -> {
+                if (bookmark.getInvestorId() != null) {
+                    Investor investor = investorRepository.findById(bookmark.getInvestorId())
+                        .orElseThrow(() -> new CustomException(ErrorCode.INVESTOR_NOT_FOUND));
+
+                    return new BookmarkListResponse(
+                        "INVESTOR",
+                        investor.getInvestorId(),
+                        investor.getInvestorName()
+                    );
+                } else if (bookmark.getStartupId() != null) {
+                    Startup startup = startupRepository.findById(bookmark.getStartupId())
+                        .orElseThrow(() -> new CustomException(ErrorCode.STARTUP_NOT_FOUND));
+                    return new BookmarkListResponse(
+                        "STARTUP",
+                        startup.getStartupId(),
+                        startup.getStartupName()
+                    );
+                } else {
+                    throw  new CustomException(ErrorCode.BOOKMARK_NOT_FOUND);
+                }
+            }).toList();
+
     }
 
     public void deleteBookmark(Long userId, Long targetUserId) {
