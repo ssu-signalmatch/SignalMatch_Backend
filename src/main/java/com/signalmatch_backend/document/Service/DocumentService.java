@@ -51,6 +51,7 @@ public class DocumentService {
                 .map(doc -> domain + "/" + doc.getObjectKey())
                 .orElse(null);
     }
+
     private DocumentResponse toResponse(Document doc, String domain) {
         String key = doc.getObjectKey();
         String fileName = key.substring(key.lastIndexOf('/') + 1);

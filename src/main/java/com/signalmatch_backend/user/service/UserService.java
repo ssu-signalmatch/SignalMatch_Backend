@@ -2,6 +2,7 @@ package com.signalmatch_backend.user.service;
 
 import com.signalmatch_backend.common.exception.CustomException;
 import com.signalmatch_backend.common.exception.ErrorCode;
+import com.signalmatch_backend.document.Service.DocumentService;
 import com.signalmatch_backend.investor.InvestorFinder;
 import com.signalmatch_backend.investor.domain.Investor;
 import com.signalmatch_backend.investor.dto.InvestorProfileInfo;
@@ -35,6 +36,7 @@ public class UserService {
     private final InvestorService investorService;
     private final StartupService startupService;
     private final JwtUtil jwtUtil;
+    private final DocumentService documentService;
 
     public void signup(SignupRequest signupRequest) {
         if(userRepository.existsByLoginId(signupRequest.loginId())){
@@ -75,12 +77,14 @@ public class UserService {
             Investor investor = investorFinder.findByOwner(user);
             long matchedStartupCount = matchRepository.countByInvestorIdAndStatus(investor.getInvestorId(), MatchStatus.ACCEPTED);
             InvestorProfileInfo profile = investorService.findInvestorProfile(userId);
-            return InvestorMyPageResponse.of(profile, matchedStartupCount);
+            String profileImageUrl = documentService.getLatestProfileImageUrl(userId);
+            return InvestorMyPageResponse.of(profile, matchedStartupCount, profileImageUrl);
         }else{
             Startup startup = startupFinder.findByOwner(user);
             long matchedInvestorCount = matchRepository.countByStartupIdAndStatus(startup.getStartupId(), MatchStatus.ACCEPTED);
             StartupProfileInfo profile = startupService.findStartupProfile(userId);
-            return StartupMyPageResponse.of(profile, matchedInvestorCount);
+            String profileImageUrl = documentService.getLatestProfileImageUrl(userId);
+            return StartupMyPageResponse.of(profile, matchedInvestorCount, profileImageUrl);
         }
     }
 }
