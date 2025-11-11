@@ -102,4 +102,12 @@ public class S3Service {
         if (i < 0) throw new CustomException(ErrorCode.FILE_EXTENSION_REQUIRED);
         return fileName.substring(i + 1).toLowerCase();
     }
+
+    public void deleteObject(String key) {
+        DeleteObjectRequest req = DeleteObjectRequest.builder()
+                .bucket(bucket)
+                .key(key)
+                .build();
+        s3Client.deleteObject(req);
+    }
 }

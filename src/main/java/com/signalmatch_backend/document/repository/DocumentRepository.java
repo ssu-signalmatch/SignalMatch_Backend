@@ -14,4 +14,10 @@ public interface DocumentRepository extends JpaRepository<Document, Long> {
     // 프로필 이미지 최신 1건
     Optional<Document> findFirstByUserIdAndObjectKeyStartingWithOrderByCreatedAtDesc(
             Long userId, String prefix);
+
+    void deleteByDocumentIdAndUserId(Long documentId, Long userId);
+
+    Optional<Document> findByDocumentIdAndUserId(Long documentId, Long userId);
 }
+
+
