@@ -43,4 +43,15 @@ public class DocumentController {
 
         return ResponseEntity.ok(ApiResponse.success("문서가 조회되었습니다.",response));
     }
+
+    @DeleteMapping("/{documentId}")
+    @Operation(summary = "문서 삭제하기", description = "S3와 DB에서 문서를 삭제합니다.")
+    public ResponseEntity<ApiResponse<Void>> deleteDocument(
+            @AuthenticationPrincipal CustomUserDetails customUserDetails,
+            @PathVariable Long documentId) {
+
+        Long userId = customUserDetails.getUser().getUserId();
+        documentService.deleteMyDocument(userId, documentId);
+        return ResponseEntity.ok(ApiResponse.success("문서가 삭제되었습니다."));
+    }
 }

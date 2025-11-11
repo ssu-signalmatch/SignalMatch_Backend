@@ -46,7 +46,8 @@ public enum ErrorCode {
 	IMAGE_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "이미지 파일 크기가 허용 범위를 초과했습니다."),
 	IR_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "IR 파일 크기가 허용 범위를 초과했습니다."),
 	PDF_ONLY(HttpStatus.BAD_REQUEST, "IR 파일은 PDF만 가능합니다."),
-	FILE_EXTENSION_REQUIRED(HttpStatus.BAD_REQUEST, "파일 확장자가 필요합니다.");
+	FILE_EXTENSION_REQUIRED(HttpStatus.BAD_REQUEST, "파일 확장자가 필요합니다."),
+	DOCUMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"해당 문서가 존재하지 않습니다.");
 
 
     private final HttpStatus status;
