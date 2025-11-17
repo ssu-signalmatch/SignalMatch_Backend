@@ -1,5 +1,6 @@
 package com.signalmatch_backend.match.consumer;
 
+import com.signalmatch_backend.match.config.KafkaTopicsConfig;
 import com.signalmatch_backend.match.domain.enums.MatchStatus;
 import com.signalmatch_backend.match.dto.MatchAcceptedEvent;
 import com.signalmatch_backend.match.dto.MatchRequestedEvent;
@@ -15,6 +16,11 @@ import java.util.Random;
 @Slf4j
 @Component
 @RequiredArgsConstructor
+@KafkaListener(
+        topics = KafkaTopicsConfig.MATCH_EVENTS,
+        groupId = "match-group",
+        containerFactory = "kafkaJsonListenerFactory"
+)
 public class MatchEventConsumer {
 
     private final MatchRepository matchRepository;
