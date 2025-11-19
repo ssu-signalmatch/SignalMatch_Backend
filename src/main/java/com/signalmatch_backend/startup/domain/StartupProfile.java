@@ -45,11 +45,13 @@ public class StartupProfile {
 
     @Enumerated(EnumType.STRING) @Column(length = 10)
     private ScaleType scale;
+
+    @Column(length = 255) private String history; //대표 약력
     // StartupProfile.java
 
     public void update(StartupProfileUpdateRequest request) {
         if (request.foundingDate() != null) {
-            this.foundingDate = request.foundingDate();
+            this.foundingDate = LocalDate.parse(request.foundingDate());
         }
         if (request.address() != null) {
             this.address = request.address();
@@ -77,6 +79,9 @@ public class StartupProfile {
         }
         if (request.scale() != null ) {
             this.scale = ScaleType.valueOf(request.scale().toUpperCase());
+        }
+        if (request.history() != null) {
+            this.history = request.history();
         }
     }
 }

@@ -17,7 +17,7 @@ public record StartupProfileCreateRequest(
     String status,
     @NotNull
     @Schema(description = "설립일")
-    LocalDate foundingDate,
+    String foundingDate,
     @NotBlank
     @Schema(description = "주소")
     String address,
@@ -63,6 +63,9 @@ public record StartupProfileCreateRequest(
     String investorStages,
     @NotEmpty
     @Schema(description = "산업분야")
-    List<String> businessAreas
+    List<String> businessAreas,
+    @NotBlank
+    @Schema(description = "대표 약력")
+    String history
 ) {
 }

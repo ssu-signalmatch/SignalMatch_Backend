@@ -36,7 +36,6 @@ public class Investor extends BaseEntity {
     @Column(nullable = false, unique = true)
     private String contactEmail;
 
-    private String position; //직책
     private String phoneNumber;
     private String websiteUrl;
 
@@ -71,9 +70,6 @@ public class Investor extends BaseEntity {
         }
         if(request.contactEmail() != null){
             this.contactEmail= request.contactEmail();
-        }
-        if(request.position() != null ){
-            this.position = request.position();
         }
         if(request.phoneNumber() != null ){
             this.phoneNumber = request.phoneNumber();

@@ -15,12 +15,15 @@ import com.signalmatch_backend.startup.domain.enums.ScaleType;
 import com.signalmatch_backend.startup.domain.enums.StartupStatus;
 import com.signalmatch_backend.startup.domain.key.StartupBusinessAreaKey;
 import com.signalmatch_backend.startup.dto.StartupProfileCreateRequest;
+import com.signalmatch_backend.startup.dto.StartupProfileCreateResponse;
 import com.signalmatch_backend.startup.dto.StartupProfileInfo;
 import com.signalmatch_backend.startup.dto.StartupProfileUpdateRequest;
 import com.signalmatch_backend.startup.repository.StartupBusinessAreaRepository;
 import com.signalmatch_backend.startup.repository.StartupRepository;
 import com.signalmatch_backend.user.UserFinder;
 import com.signalmatch_backend.user.domain.User;
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.List;
 import lombok.RequiredArgsConstructor;
 import org.hibernate.sql.ast.tree.expression.Star;
@@ -36,7 +39,7 @@ public class StartupService {
     private final StartupBusinessAreaRepository startupBusinessAreaRepository;
     private final StartupFinder startupFinder;
     @Transactional
-    public void createStartupProfile(Long userId, StartupProfileCreateRequest request){
+    public StartupProfileCreateResponse createStartupProfile(Long userId, StartupProfileCreateRequest request){
         User owner = userFinder.findByUserId(userId);
         if(startupRepository.existsByOwner(owner)){
             throw new CustomException(ErrorCode.PROFILE_ALREADY_EXISTS);
@@ -50,7 +53,7 @@ public class StartupService {
 
         StartupProfile newStartupProfile = StartupProfile.builder()
             .startup(newStartup)
-            .foundingDate(request.foundingDate())
+            .foundingDate(LocalDate.parse(request.foundingDate()))
             .address(request.address())
             .homepageUrl(request.homepageUrl())
             .contactEmail(request.contactEmail())
@@ -60,6 +63,7 @@ public class StartupService {
             .employeeCount(request.employeeCount())
             .legalType(LegalType.valueOf(request.legalType().toUpperCase()))
             .scale(ScaleType.valueOf(request.scale().toUpperCase()))
+            .history(request.history())
             .build();
 
         newStartup.addStartupProfile(newStartupProfile);
@@ -88,7 +92,7 @@ public class StartupService {
                 .build())
             .toList();
         startupBusinessAreaRepository.saveAll(businessAreaList);
-
+       return new StartupProfileCreateResponse(savedStartup.getStartupId());
 
     }
     @Transactional
