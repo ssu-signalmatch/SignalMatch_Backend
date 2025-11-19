@@ -2,6 +2,7 @@ package com.signalmatch_backend.startup.controller;
 
 import com.signalmatch_backend.common.domain.ApiResponse;
 import com.signalmatch_backend.startup.dto.StartupProfileCreateRequest;
+import com.signalmatch_backend.startup.dto.StartupProfileCreateResponse;
 import com.signalmatch_backend.startup.dto.StartupProfileInfo;
 import com.signalmatch_backend.startup.dto.StartupProfileUpdateRequest;
 import com.signalmatch_backend.startup.service.StartupService;
@@ -28,10 +29,10 @@ public class StartupController {
     private final StartupService startupService;
     @PostMapping("/startups/me")
     @Operation(summary = "스타트업 프로필 생성",description = "사용자의 스타트업 프로필을 생성합니다.")
-    public ResponseEntity<ApiResponse<Void>> startupProfileCreate(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Valid @RequestBody StartupProfileCreateRequest request){
+    public ResponseEntity<ApiResponse<StartupProfileCreateResponse>> startupProfileCreate(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Valid @RequestBody StartupProfileCreateRequest request){
         Long userId = customUserDetails.getUser().getUserId();
-        startupService.createStartupProfile(userId, request);
-        return ResponseEntity.ok(ApiResponse.success("스타트업 프로필 생성이 완료되었습니다."));
+        StartupProfileCreateResponse response = startupService.createStartupProfile(userId, request);
+        return ResponseEntity.ok(ApiResponse.success("스타트업 프로필 생성이 완료되었습니다.",response));
     }
 
     @PatchMapping("/startups/me")

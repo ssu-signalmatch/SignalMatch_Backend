@@ -47,7 +47,6 @@ public class InvestorService {
             .owner(owner)
             .investorName(request.investorName())
             .contactEmail(request.contactEmail())
-            .position(request.position())
             .phoneNumber(request.phoneNumber())
             .websiteUrl(request.websiteUrl())
             .intro(request.intro())
@@ -92,6 +91,7 @@ public class InvestorService {
         Investor investor = investorRepository.findByOwner(owner).orElseThrow(() -> new CustomException(ErrorCode.INVESTOR_NOT_FOUND));
         investor.update(request);
         if(request.preferredStages() != null){
+
             updatePreferredStages(investor,request.preferredStages());
         }
         if(request.preferredAreas() != null){

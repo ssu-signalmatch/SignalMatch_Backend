@@ -14,7 +14,7 @@ public record StartupProfileInfo(
     String status,
 
     @Schema(description = "설립일")
-    LocalDate foundingDate,
+    String foundingDate,
 
     @Schema(description = "주소")
     String address,
@@ -60,13 +60,15 @@ public record StartupProfileInfo(
     String investorStages,
 
     @Schema(description = "산업분야")
-    List<String> businessAreas
+    List<String> businessAreas,
+    @Schema(description = "대표 약력")
+    String history
 ) {
     public static StartupProfileInfo toStartupProfileInfo(Startup startup, List<String> startupBusinessAreas){
         return new StartupProfileInfo(
             startup.getStartupName(),
             startup.getStatus().name(),
-            startup.getStartupProfile().getFoundingDate(),
+            startup.getStartupProfile().getFoundingDate().toString(),
             startup.getStartupProfile().getAddress(),
             startup.getStartupProfile().getHomepageUrl(),
             startup.getStartupProfile().getContactEmail(),
@@ -81,7 +83,8 @@ public record StartupProfileInfo(
             startup.getStartupFinance().getFundingRounds(),
             startup.getStartupFinance().getTotalFunding(),
             startup.getStartupFinance().getInvestorStages().name(),
-            startupBusinessAreas
+            startupBusinessAreas,
+            startup.getStartupProfile().getHistory()
         );
     }
 }

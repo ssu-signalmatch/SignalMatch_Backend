@@ -8,8 +8,6 @@ public record InvestorProfileUpdateRequest(
     String investorName,
     @Schema(description = "투자자 이메일")
     String contactEmail,
-    @Schema(description = "직함")
-    String position,
     @Schema(description = "연락처")
     String phoneNumber,
     @Schema(description = "url")
