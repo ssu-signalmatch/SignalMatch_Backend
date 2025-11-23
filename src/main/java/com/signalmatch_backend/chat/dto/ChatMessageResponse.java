@@ -1,16 +1,17 @@
 package com.signalmatch_backend.chat.dto;
 
 import com.signalmatch_backend.chat.domain.ChatMessage;
-import com.signalmatch_backend.chat.domain.enums.ChatSenderRole;
+import com.signalmatch_backend.user.domain.enums.UserRole;
 
 import java.time.LocalDateTime;
+
 
 public record ChatMessageResponse(
         Long id,
         Long chatRoomId,
         Long startupId,
         Long investorId,
-        ChatSenderRole senderRole,
+        UserRole senderRole,   // STARTUP / INVESTOR
         Long senderId,
         String content,
         LocalDateTime createdAt,
@@ -22,7 +23,7 @@ public record ChatMessageResponse(
                 m.getChatRoom().getId(),
                 m.getChatRoom().getStartupId(),
                 m.getChatRoom().getInvestorId(),
-                m.getSenderRole(),
+                m.getSenderRole(),        // ChatMessage.senderRole 타입을 UserRole 로 두는 걸 추천
                 m.getSenderId(),
                 m.getContent(),
                 m.getCreatedAt(),

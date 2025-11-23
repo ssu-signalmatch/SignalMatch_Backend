@@ -1,9 +1,8 @@
 package com.signalmatch_backend.chat.dto;
 
-import com.signalmatch_backend.chat.domain.enums.ChatSenderRole;
+import jakarta.validation.constraints.NotBlank;
 
 public record ChatMessageRequest(
-        ChatSenderRole senderRole,  // STARTUP / INVESTOR
-        Long senderId,              // 실제 주체 ID (startupId or investorId)
+        @NotBlank(message = "메시지 내용은 필수입니다.")
         String content
 ) {}
