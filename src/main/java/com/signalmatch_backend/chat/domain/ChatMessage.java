@@ -25,6 +25,7 @@ public class ChatMessage {
     @Enumerated(EnumType.STRING)
     private UserRole senderRole;  // STARTUP / INVESTOR
 
+    @Column(nullable = false)
     private Long senderId;              // 실제 사용자 PK
 
     @Column(nullable = false, length = 1000)
@@ -32,13 +33,6 @@ public class ChatMessage {
 
 
     private boolean deleted = false;
-
-    private LocalDateTime createdAt;
-
-    @PrePersist
-    void prePersist() {
-        this.createdAt = LocalDateTime.now();
-    }
 
     public void softDelete() {
         this.deleted = true;

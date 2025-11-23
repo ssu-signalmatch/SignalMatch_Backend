@@ -28,17 +28,10 @@ public class ChatRoom {
     @Column(name = "investor_id", nullable = false)
     private Long investorId;
 
-    @Column(nullable = false, updatable = false)
-    private LocalDateTime createdAt;
 
 
     public ChatRoom(Long startupId, Long investorId) {
         this.startupId = startupId;
         this.investorId = investorId;
-    }
-
-    @PrePersist
-    void prePersist() {
-        this.createdAt = LocalDateTime.now();
     }
 }
