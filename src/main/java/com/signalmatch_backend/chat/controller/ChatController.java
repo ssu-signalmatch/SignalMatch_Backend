@@ -9,6 +9,7 @@ import com.signalmatch_backend.common.domain.ApiResponse;
 import com.signalmatch_backend.user.domain.User;
 import com.signalmatch_backend.user.domain.enums.UserRole;
 import com.signalmatch_backend.user.jwt.CustomUserDetails;
+import io.swagger.v3.oas.annotations.Operation;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -25,6 +26,7 @@ public class ChatController {
     private final ChatService chatService;
 
     @PostMapping("/rooms")
+    @Operation(summary = "채팅방 생성",description = "투자자와 스타트업간 채팅방을 생성합니다.")
     public ResponseEntity<ApiResponse<ChatRoomResponse>> createOrGetRoom(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @Valid @RequestBody ChatRoomCreateRequest request
@@ -40,6 +42,7 @@ public class ChatController {
 
 
     @GetMapping("/rooms/{roomId}/messages")
+    @Operation(summary = "메시지 생성",description = "투자자와 스타트업간 메시지를 전송합니다.")
     public ResponseEntity<ApiResponse<List<ChatMessageResponse>>> getMessages(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long roomId,
@@ -64,6 +67,7 @@ public class ChatController {
 
 
     @PostMapping("/rooms/{roomId}/messages")
+    @Operation(summary = "메시지 조회",description = "투자자와 스타트업간 메시지를 조회합니다.")
     public ResponseEntity<ApiResponse<ChatMessageResponse>> sendMessage(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long roomId,
@@ -85,6 +89,7 @@ public class ChatController {
     }
 
     @DeleteMapping("/messages/{messageId}")
+    @Operation(summary = "메시지 삭제",description = "투자자와 스타트업간 메시지를 삭제합니다.")
     public ResponseEntity<ApiResponse<Void>> deleteMessage(
             @AuthenticationPrincipal CustomUserDetails userDetails,
             @PathVariable Long messageId
