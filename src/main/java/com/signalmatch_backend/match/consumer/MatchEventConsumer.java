@@ -27,10 +27,41 @@ public class MatchEventConsumer {
 
 
     @KafkaHandler
-    public void onRequested(MatchRequestedEvent event) {
+    public void handleRequestedEvent(MatchRequestedEvent event) {
+        log.info("[match.events] received MatchRequestedEvent: {}", event);
+
+        MatchStatus status = MatchStatus.valueOf(event.status());
+
+        switch (status) {
+            case REQUESTED -> handleRequested(event);
+            case REJECTED -> handleRejected(event);
+            case CANCELLED  -> handleCanceled(event);
+            default -> log.warn("Unknown MatchStatus: {}", status);
+        }
+    }
+
+    private void handleRequested(MatchRequestedEvent event) {
         log.info("[match.events] requested: {}", event);
         matchRepository.findById(event.matchId()).ifPresent(match -> {
-            match.setStatus(MatchStatus.valueOf(event.status()));
+            match.setStatus(MatchStatus.REQUESTED);
+            matchRepository.save(match);
+            log.info("Match {} -> {}", match.getMatchId(), match.getStatus());
+        });
+    }
+
+    private void handleRejected(MatchRequestedEvent event) {
+        log.info("[match.events] rejected: {}", event);
+        matchRepository.findById(event.matchId()).ifPresent(match -> {
+            match.setStatus(MatchStatus.REJECTED);
+            matchRepository.save(match);
+            log.info("Match {} -> {}", match.getMatchId(), match.getStatus());
+        });
+    }
+
+    private void handleCanceled(MatchRequestedEvent event) {
+        log.info("[match.events] canceled: {}", event);
+        matchRepository.findById(event.matchId()).ifPresent(match -> {
+            match.setStatus(MatchStatus.CANCELLED);
             matchRepository.save(match);
             log.info("Match {} -> {}", match.getMatchId(), match.getStatus());
         });
@@ -40,27 +71,7 @@ public class MatchEventConsumer {
     public void onAccepted(MatchAcceptedEvent event) {
         log.info("[match.events] accepted: {}", event);
         matchRepository.findById(event.matchId()).ifPresent(match -> {
-            match.setStatus(MatchStatus.valueOf(event.status())); // ACCEPTED
-            matchRepository.save(match);
-            log.info("Match {} -> {}", match.getMatchId(), match.getStatus());
-        });
-    }
-
-    @KafkaHandler
-    public void onRejected(MatchRequestedEvent event){
-        log.info("[match.events] rejected: {}", event);
-        matchRepository.findById(event.matchId()).ifPresent(match -> {
-            match.setStatus(MatchStatus.valueOf(event.status())); // ACCEPTED
-            matchRepository.save(match);
-            log.info("Match {} -> {}", match.getMatchId(), match.getStatus());
-        });
-    }
-
-    @KafkaHandler
-    public void onCanceled(MatchRequestedEvent event){
-        log.info("[match.events] rejected: {}", event);
-        matchRepository.findById(event.matchId()).ifPresent(match -> {
-            match.setStatus(MatchStatus.valueOf(event.status())); // ACCEPTED
+            match.setStatus(MatchStatus.valueOf(event.status())); // 일반적으로 ACCEPTED
             matchRepository.save(match);
             log.info("Match {} -> {}", match.getMatchId(), match.getStatus());
         });
