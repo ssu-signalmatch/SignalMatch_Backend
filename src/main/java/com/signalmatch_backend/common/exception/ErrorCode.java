@@ -47,7 +47,13 @@ public enum ErrorCode {
 	IR_SIZE_EXCEEDED(HttpStatus.BAD_REQUEST, "IR 파일 크기가 허용 범위를 초과했습니다."),
 	PDF_ONLY(HttpStatus.BAD_REQUEST, "IR 파일은 PDF만 가능합니다."),
 	FILE_EXTENSION_REQUIRED(HttpStatus.BAD_REQUEST, "파일 확장자가 필요합니다."),
-	DOCUMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"해당 문서가 존재하지 않습니다.");
+	DOCUMENT_NOT_FOUND(HttpStatus.NOT_FOUND,"해당 문서가 존재하지 않습니다."),
+
+	// Chat Error
+	CHATROOM_NOT_FOUND(HttpStatus.NOT_FOUND, "채팅방을 찾을 수 없습니다."),
+	CHATROOM_ACCESS_DENIED(HttpStatus.FORBIDDEN, "이 채팅방에 접근할 수 없습니다."),
+	CHATMESSAGE_NOT_FOUND(HttpStatus.NOT_FOUND, "메시지를 찾을 수 없습니다."),
+	CHAT_SENDER_INVALID(HttpStatus.BAD_REQUEST, "메시지에 권한이 없습니다.");
 
 
     private final HttpStatus status;
