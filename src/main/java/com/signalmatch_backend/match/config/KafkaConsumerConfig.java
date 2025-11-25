@@ -18,7 +18,7 @@ public class KafkaConsumerConfig {
         factory.setConsumerFactory(consumerFactory);
 
         // JSON → DTO 자동 변환
-        factory.setRecordMessageConverter(new StringJsonMessageConverter());
+//        factory.setRecordMessageConverter(new StringJsonMessageConverter());
         return factory;
     }
 }
