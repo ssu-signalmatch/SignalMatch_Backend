@@ -19,7 +19,7 @@ public class StartupSpecification {
                 predicate = cb.and(predicate, cb.or(
                     cb.like(root.get("startupName"), like),
                     cb.like(root.get("owner").get("name"), like),
-                    cb.like(root.get("startupProfile").get("Intro"), like)
+                    cb.like(root.get("startupProfile").get("intro"), like)
                 ));
             }
 
