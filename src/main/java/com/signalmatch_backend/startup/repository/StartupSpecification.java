@@ -18,7 +18,8 @@ public class StartupSpecification {
                 String like = "%" + keyword + "%";
                 predicate = cb.and(predicate, cb.or(
                     cb.like(root.get("startupName"), like),
-                    cb.like(root.get("owner").get("name"), like)
+                    cb.like(root.get("owner").get("name"), like),
+                    cb.like(root.get("startupProfile").get("Intro"), like)
                 ));
             }
 
