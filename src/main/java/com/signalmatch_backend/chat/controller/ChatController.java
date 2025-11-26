@@ -1,9 +1,6 @@
 package com.signalmatch_backend.chat.controller;
 
-import com.signalmatch_backend.chat.dto.ChatMessageCreateRequest;
-import com.signalmatch_backend.chat.dto.ChatMessageResponse;
-import com.signalmatch_backend.chat.dto.ChatRoomCreateRequest;
-import com.signalmatch_backend.chat.dto.ChatRoomResponse;
+import com.signalmatch_backend.chat.dto.*;
 import com.signalmatch_backend.chat.service.ChatService;
 import com.signalmatch_backend.common.domain.ApiResponse;
 import com.signalmatch_backend.user.domain.User;
@@ -103,4 +100,20 @@ public class ChatController {
                 ApiResponse.success("메시지 삭제 성공")
         );
     }
+
+    @GetMapping
+    @Operation(summary = "채팅방 목록 조회", description = "현재 로그인한 사용자의 전체 채팅방 목록을 조회합니다.")
+    public ResponseEntity<ApiResponse<List<ChatRoomListResponse>>> getChatRooms(
+            @AuthenticationPrincipal CustomUserDetails userDetails
+    ) {
+        Long userId = userDetails.getUser().getUserId();
+        UserRole role = userDetails.getUser().getUserRole();
+
+        List<ChatRoomListResponse> responses = chatService.getChatRooms(userId, role);
+
+        return ResponseEntity.ok(
+                ApiResponse.success("채팅방 목록 조회 성공", responses)
+        );
+    }
+
 }

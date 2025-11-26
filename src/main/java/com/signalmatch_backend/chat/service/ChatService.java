@@ -7,21 +7,26 @@ import com.signalmatch_backend.chat.domain.ChatMessage;
 import com.signalmatch_backend.chat.domain.ChatRoom;
 import com.signalmatch_backend.chat.dto.ChatMessageResponse;
 import com.signalmatch_backend.chat.dto.ChatRoomCreateRequest;
+import com.signalmatch_backend.chat.dto.ChatRoomListResponse;
 import com.signalmatch_backend.chat.dto.ChatRoomResponse;
 import com.signalmatch_backend.chat.repository.ChatMessageRepository;
 import com.signalmatch_backend.chat.repository.ChatRoomRepository;
 import com.signalmatch_backend.common.exception.CustomException;
 import com.signalmatch_backend.common.exception.ErrorCode;
+import com.signalmatch_backend.document.Service.DocumentService;
 import com.signalmatch_backend.investor.InvestorFinder;
 import com.signalmatch_backend.startup.StartupFinder;
 import com.signalmatch_backend.user.domain.User;
 import com.signalmatch_backend.user.domain.enums.UserRole;
+import com.signalmatch_backend.user.repository.UserRepository;
 import lombok.RequiredArgsConstructor;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.util.List;
+import java.time.LocalDateTime;
+import java.util.*;
+import java.util.stream.Collectors;
 
 @Service
 @RequiredArgsConstructor
@@ -33,6 +38,8 @@ public class ChatService {
     private final ChatMessageFinder chatMessageFinder;
     private final StartupFinder startupFinder;
     private final InvestorFinder investorFinder;
+    private final DocumentService documentService;
+    private final UserRepository userRepository;
 
     @Transactional
     public ChatRoomResponse createOrGetRoom(User user, ChatRoomCreateRequest request) {
@@ -99,6 +106,7 @@ public class ChatService {
         }
     }
 
+    @Transactional
     public List<ChatMessageResponse> getMessages(
             Long roomId,
             Long requesterId,
@@ -121,6 +129,12 @@ public class ChatService {
                             roomId,
                             PageRequest.of(0, size)
                     );
+        }
+
+        for (ChatMessage message : messages) {
+            if (!message.getSenderId().equals(requesterId)) {
+                message.markRead(requesterRole);
+            }
         }
 
         return messages.stream()
@@ -153,6 +167,88 @@ public class ChatService {
         if (role == UserRole.INVESTOR && !room.getInvestorId().equals(userId)) {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
+    }
+
+    public List<ChatRoomListResponse> getChatRooms(Long userId, UserRole role) {
+
+        // 1) 현재 유저가 참여한 모든 채팅방 조회
+        List<ChatRoom> rooms = chatRoomRepository.findAllByUser(userId, role.name());
+
+        if (rooms.isEmpty()) {
+            return List.of();
+        }
+
+        // 2) 상대방 userId 목록 추출
+        List<Long> opponentIds = rooms.stream()
+                .map(room -> role == UserRole.STARTUP ? room.getInvestorId() : room.getStartupId())
+                .distinct()
+                .toList();
+
+        // 3) 상대 유저 정보 한 번에 조회 후 Map으로 보관 (id -> User)
+        Map<Long, User> opponentMap = userRepository.findAllById(opponentIds)
+                .stream()
+                .collect(Collectors.toMap(User::getUserId, u -> u));
+
+        List<ChatRoomListResponse> result = new ArrayList<>();
+
+        for (ChatRoom room : rooms) {
+            Long opponentId = (role == UserRole.STARTUP)
+                    ? room.getInvestorId()
+                    : room.getStartupId();
+
+            User opponent = opponentMap.get(opponentId);
+            if (opponent == null) {
+                // 혹시라도 user가 삭제되어 없는 경우
+                throw new CustomException(ErrorCode.USER_NOT_FOUND);
+            }
+
+            // 4) 마지막 메시지 조회
+            Optional<ChatMessage> lastOpt =
+                    chatMessageRepository.findTopByChatRoomIdAndDeletedFalseOrderByIdDesc(room.getId());
+
+            String lastContent = lastOpt.map(ChatMessage::getContent).orElse(null);
+            LocalDateTime lastTime = lastOpt.map(ChatMessage::getCreatedAt).orElse(null);
+
+            // 5) 안 읽은 메시지 개수 계산 (상대가 보낸 & 내가 아직 안 읽은 것만)
+            long unreadCount;
+            if (role == UserRole.STARTUP) {
+                unreadCount = chatMessageRepository
+                        .countByChatRoomIdAndDeletedFalseAndSenderRoleNotAndReadByStartupFalse(
+                                room.getId(), role
+                        );
+            } else { // INVESTOR
+                unreadCount = chatMessageRepository
+                        .countByChatRoomIdAndDeletedFalseAndSenderRoleNotAndReadByInvestorFalse(
+                                room.getId(), role
+                        );
+            }
+
+            // 6) 상대방 최신 프로필 이미지 URL (없으면 null)
+            String opponentProfileImageUrl = documentService.getLatestProfileImageUrl(opponentId);
+
+            // 7) DTO 빌드
+            result.add(
+                    ChatRoomListResponse.builder()
+                            .roomId(room.getId())
+                            .opponentId(opponentId)
+                            .opponentName(opponent.getName())
+                            .opponentProfileImage(opponentProfileImageUrl)
+                            .lastMessage(lastContent)
+                            .lastMessageTime(lastTime)
+                            .hasUnread(unreadCount > 0)
+                            .build()
+            );
+        }
+
+        // 8) 마지막 메시지 시간 기준으로 내림차순 정렬 (최신 채팅방이 위로 오게)
+        result.sort(
+                Comparator.comparing(
+                        ChatRoomListResponse::lastMessageTime,
+                        Comparator.nullsLast(Comparator.reverseOrder())
+                )
+        );
+
+        return result;
     }
 
 }

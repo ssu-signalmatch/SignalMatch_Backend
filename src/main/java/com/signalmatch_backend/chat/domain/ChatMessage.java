@@ -4,6 +4,7 @@ import com.signalmatch_backend.user.domain.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.LocalDateTime;
 
@@ -34,6 +35,17 @@ public class ChatMessage {
 
     private boolean deleted = false;
 
+    @CreationTimestamp
+    @Column(nullable = false, updatable = false)
+    private LocalDateTime createdAt;
+
+    // 읽음 여부 (각 역할별)
+    @Column(nullable = false)
+    private boolean readByStartup = false;
+
+    @Column(nullable = false)
+    private boolean readByInvestor = false;
+
     public void softDelete() {
         this.deleted = true;
         this.content = "(삭제된 메시지입니다)";
@@ -44,6 +56,14 @@ public class ChatMessage {
         this.senderRole = senderRole;
         this.senderId = senderId;
         this.content = content;
+    }
+
+    public void markRead(UserRole viewerRole) {
+        if (viewerRole == UserRole.STARTUP) {
+            this.readByStartup = true;
+        } else if (viewerRole == UserRole.INVESTOR) {
+            this.readByInvestor = true;
+        }
     }
 
 }
