@@ -4,6 +4,7 @@ import io.swagger.v3.oas.annotations.media.Schema;
 
 public record LoginResponse(
         @Schema(description = "jwt 액세스 토큰")
-        String accessToken
+        String accessToken,
+        long userId
 ) {
 }
