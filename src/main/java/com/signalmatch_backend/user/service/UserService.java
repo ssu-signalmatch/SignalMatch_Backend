@@ -84,7 +84,7 @@ public class UserService {
             long matchedInvestorCount = matchRepository.countByStartupIdAndStatus(startup.getStartupId(), MatchStatus.ACCEPTED);
             StartupProfileInfo profile = startupService.findStartupProfile(userId);
             String profileImageUrl = documentService.getLatestProfileImageUrl(userId);
-            return StartupMyPageResponse.of(profile, matchedInvestorCount, profileImageUrl);
+            return StartupMyPageResponse.of(profile, matchedInvestorCount, profileImageUrl   );
         }
     }
 }
