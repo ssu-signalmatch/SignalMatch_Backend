@@ -4,6 +4,7 @@ import com.signalmatch_backend.bookmark.domain.Bookmark;
 import com.signalmatch_backend.bookmark.dto.BookmarkListResponse;
 import com.signalmatch_backend.bookmark.dto.BookmarkRequest;
 import com.signalmatch_backend.bookmark.dto.BookmarkResponse;
+import com.signalmatch_backend.bookmark.dto.StartupBookmarkInfo;
 import com.signalmatch_backend.bookmark.repository.BookmarkRepository;
 import com.signalmatch_backend.common.exception.CustomException;
 import com.signalmatch_backend.common.exception.ErrorCode;
@@ -17,6 +18,8 @@ import com.signalmatch_backend.user.domain.enums.UserRole;
 import java.util.List;
 import java.util.Optional;
 import lombok.RequiredArgsConstructor;
+import org.springframework.data.domain.PageRequest;
+import org.springframework.data.domain.Pageable;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -104,6 +107,11 @@ public class BookmarkService {
         Bookmark bookmark = bookmarkRepository.findByUserIdAndStartupId(userId, startup.getStartupId())
             .orElseThrow(() -> new CustomException(ErrorCode.BOOKMARK_NOT_FOUND));
         bookmarkRepository.delete(bookmark);
+    }
+
+    public List<StartupBookmarkInfo> getTop10Startups() {
+        Pageable pageable = PageRequest.of(0, 10);
+        return bookmarkRepository.findTop10ByBookmarkCount(pageable);
     }
 
 }
