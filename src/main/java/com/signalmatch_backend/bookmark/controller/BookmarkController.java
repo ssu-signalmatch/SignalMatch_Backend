@@ -57,7 +57,7 @@ public class BookmarkController {
     @Operation(summary = "스타트업 검색 인기 순위 조회", description = "스타트업 검색 인기 순위 Top 10을 조회합니다.")
     public ResponseEntity<ApiResponse<List<StartupBookmarkInfo>>> getTop10Rankings() {
         List<StartupBookmarkInfo> response = bookmarkService.getTop10Startups();
-        return ResponseEntity.ok(ApiResponse.success("즐겨찾기 목록의 조회가 완료되었습니다.",response));
+        return ResponseEntity.ok(ApiResponse.success("스타트업 검색 인기 순위 조회가 완료되었습니다.",response));
     }
 
 }
