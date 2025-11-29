@@ -1,6 +1,8 @@
 package com.signalmatch_backend.user.domain;
 
 import com.signalmatch_backend.common.domain.BaseEntity;
+import com.signalmatch_backend.investor.domain.Investor;
+import com.signalmatch_backend.startup.domain.Startup;
 import com.signalmatch_backend.user.domain.enums.UserRole;
 import jakarta.persistence.*;
 import lombok.*;
@@ -29,4 +31,14 @@ public class User extends BaseEntity {
     @Enumerated(EnumType.STRING)
     @Column(nullable = false, length = 20)
     private UserRole userRole;
+
+    @OneToOne(mappedBy = "owner",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private Startup startup;
+
+    @OneToOne(mappedBy = "owner",
+            cascade = CascadeType.ALL,
+            orphanRemoval = true)
+    private Investor investor;
 }
