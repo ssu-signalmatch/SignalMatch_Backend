@@ -69,7 +69,8 @@ public class UserService {
             userId = startupFinder.findByOwner(user).getStartupId();
         }
 
-        return new LoginResponse(accessToken, userId);
+        String userRole = user.getUserRole().name();
+        return new LoginResponse(accessToken, userId, userRole);
     }
 
     public void delete(Long userId) {
