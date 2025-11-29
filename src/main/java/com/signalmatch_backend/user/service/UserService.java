@@ -61,15 +61,8 @@ public class UserService {
         }
 
         String accessToken = jwtUtil.createAccessToken(loginRequest.loginId());
-        UserRole role = user.getUserRole();
-        long userId;
-        if(role == UserRole.INVESTOR) {
-            userId = investorFinder.findByOwner(user).getInvestorId();
-        }else{
-            userId = startupFinder.findByOwner(user).getStartupId();
-        }
-
         String userRole = user.getUserRole().name();
+        long userId = user.getUserId();
         return new LoginResponse(accessToken, userId, userRole);
     }
 
