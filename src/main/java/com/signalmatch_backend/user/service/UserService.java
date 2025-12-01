@@ -1,5 +1,7 @@
 package com.signalmatch_backend.user.service;
 
+import com.signalmatch_backend.bookmark.domain.Bookmark;
+import com.signalmatch_backend.bookmark.service.BookmarkService;
 import com.signalmatch_backend.common.exception.CustomException;
 import com.signalmatch_backend.common.exception.ErrorCode;
 import com.signalmatch_backend.document.Service.DocumentService;
@@ -76,16 +78,16 @@ public class UserService {
 
         if(user.getUserRole().equals(UserRole.INVESTOR)){
             Investor investor = investorFinder.findByOwner(user);
-            long matchedStartupCount = matchRepository.countByInvestorIdAndStatus(investor.getInvestorId(), MatchStatus.ACCEPTED);
+            long bookmarkCount = investorService.getMyBookmarkCount(investor.getInvestorId());
             InvestorProfileInfo profile = investorService.findInvestorProfile(userId);
             String profileImageUrl = documentService.getLatestProfileImageUrl(userId);
-            return InvestorMyPageResponse.of(profile, matchedStartupCount, profileImageUrl);
+            return InvestorMyPageResponse.of(profile, bookmarkCount, profileImageUrl);
         }else{
             Startup startup = startupFinder.findByOwner(user);
-            long matchedInvestorCount = matchRepository.countByStartupIdAndStatus(startup.getStartupId(), MatchStatus.ACCEPTED);
+            long bookmarkCount = startupService.getMyBookmarkCount(startup.getStartupId());
             StartupProfileInfo profile = startupService.findStartupProfile(userId);
             String profileImageUrl = documentService.getLatestProfileImageUrl(userId);
-            return StartupMyPageResponse.of(profile, matchedInvestorCount, profileImageUrl   );
+            return StartupMyPageResponse.of(profile, bookmarkCount, profileImageUrl   );
         }
     }
 }

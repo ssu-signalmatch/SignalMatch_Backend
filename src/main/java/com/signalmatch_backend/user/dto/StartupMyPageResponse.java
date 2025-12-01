@@ -5,10 +5,10 @@ import com.signalmatch_backend.startup.dto.StartupProfileInfo;
 
 public record StartupMyPageResponse(
         StartupProfileInfo profile,
-        long matchedInvestorCount,
+        long bookmarkCount,
         String profileImageUrl
 ) implements MyPageResponse {
-    public static StartupMyPageResponse of(StartupProfileInfo profile, long matchedCount,String profileImageUrl) {
-        return new StartupMyPageResponse(profile, matchedCount, profileImageUrl);
+    public static StartupMyPageResponse of(StartupProfileInfo profile, long bookmarkCount,String profileImageUrl) {
+        return new StartupMyPageResponse(profile, bookmarkCount, profileImageUrl);
     }
 }
