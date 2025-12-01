@@ -2,6 +2,8 @@ package com.signalmatch_backend.investor.service;
 
 import com.signalmatch_backend.BusinessArea.domain.BusinessArea;
 import com.signalmatch_backend.BusinessArea.repository.BusinessAreaRepository;
+import com.signalmatch_backend.bookmark.repository.BookmarkRepository;
+import com.signalmatch_backend.bookmark.service.BookmarkService;
 import com.signalmatch_backend.common.exception.CustomException;
 import com.signalmatch_backend.common.exception.ErrorCode;
 import com.signalmatch_backend.investor.InvestorFinder;
@@ -36,6 +38,7 @@ public class InvestorService {
     private final InvestorPreferredAreaRepository investorPreferredAreaRepository;
     private final InvestorPreferredStageRepository investorPreferredStageRepository;
     private final InvestorFinder investorFinder;
+    private final BookmarkRepository bookmarkRepository;
     @Transactional
     public InvestorProfileCreateResponse createInvestorProfile(Long userId, InvestorProfileCreateRequest request){
         User owner = userFinder.findByUserId(userId);
@@ -142,5 +145,8 @@ public class InvestorService {
             .toList();
 
         return  InvestorProfileInfo.toInvestorProfileInfo(investor, investorPreferredAreaNames);
+    }
+    public long getMyBookmarkCount(Long investorId) {
+        return bookmarkRepository.countByInvestorId(investorId);
     }
 }

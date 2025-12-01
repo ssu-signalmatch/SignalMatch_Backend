@@ -2,8 +2,10 @@ package com.signalmatch_backend.startup.service;
 
 import com.signalmatch_backend.BusinessArea.domain.BusinessArea;
 import com.signalmatch_backend.BusinessArea.repository.BusinessAreaRepository;
+import com.signalmatch_backend.bookmark.repository.BookmarkRepository;
 import com.signalmatch_backend.common.exception.CustomException;
 import com.signalmatch_backend.common.exception.ErrorCode;
+import com.signalmatch_backend.investor.domain.Investor;
 import com.signalmatch_backend.startup.StartupFinder;
 import com.signalmatch_backend.startup.domain.Startup;
 import com.signalmatch_backend.startup.domain.StartupBusinessArea;
@@ -38,6 +40,7 @@ public class StartupService {
     private final BusinessAreaRepository businessAreaRepository;
     private final StartupBusinessAreaRepository startupBusinessAreaRepository;
     private final StartupFinder startupFinder;
+    private final BookmarkRepository bookmarkRepository;
     @Transactional
     public StartupProfileCreateResponse createStartupProfile(Long userId, StartupProfileCreateRequest request){
         User owner = userFinder.findByUserId(userId);
@@ -134,5 +137,8 @@ public class StartupService {
             .map(area -> area.getBusinessArea().getName()).toList();
 
         return  StartupProfileInfo.toStartupProfileInfo(startup,startupBusinessAreaNames);
+    }
+    public long getMyBookmarkCount(Long startupId) {
+        return bookmarkRepository.countByStartupId(startupId);
     }
 }

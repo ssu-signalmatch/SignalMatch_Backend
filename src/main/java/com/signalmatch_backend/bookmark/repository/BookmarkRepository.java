@@ -25,4 +25,7 @@ public interface BookmarkRepository extends JpaRepository<Bookmark,Long> {
         "GROUP BY s.startupId, s.startupName, sp.intro " +
         "ORDER BY COUNT(b) DESC")
     List<StartupBookmarkInfo> findTop10ByBookmarkCount(Pageable pageable);
+
+    long countByInvestorId(Long investorId);
+    long countByStartupId(Long startupId);
 }
