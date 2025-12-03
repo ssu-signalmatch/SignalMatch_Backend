@@ -1,10 +1,12 @@
 package com.signalmatch_backend.startup.controller;
 
 import com.signalmatch_backend.common.domain.ApiResponse;
+import com.signalmatch_backend.investor.dto.InvestorProfileUpdateResponse;
 import com.signalmatch_backend.startup.dto.StartupProfileCreateRequest;
 import com.signalmatch_backend.startup.dto.StartupProfileCreateResponse;
 import com.signalmatch_backend.startup.dto.StartupProfileInfo;
 import com.signalmatch_backend.startup.dto.StartupProfileUpdateRequest;
+import com.signalmatch_backend.startup.dto.StartupProfileUpdateResponse;
 import com.signalmatch_backend.startup.service.StartupService;
 import com.signalmatch_backend.user.jwt.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -37,10 +39,10 @@ public class StartupController {
 
     @PatchMapping("/startups/me")
     @Operation(summary = "스타트업 프로필 수정", description = "스타트업 프로필을 수정합니다.")
-    public ResponseEntity<ApiResponse<Void>> startupProfileUpdate(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Valid @RequestBody StartupProfileUpdateRequest request){
+    public ResponseEntity<ApiResponse<StartupProfileUpdateResponse>> startupProfileUpdate(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Valid @RequestBody StartupProfileUpdateRequest request){
         Long userId = customUserDetails.getUser().getUserId();
-        startupService.updateStartupProfile(userId,request);
-        return ResponseEntity.ok(ApiResponse.success("스타트업 프로필 수정이 완료되었습니다."));
+        StartupProfileUpdateResponse response = startupService.updateStartupProfile(userId,request);
+        return ResponseEntity.ok(ApiResponse.success("스타트업 프로필 수정이 완료되었습니다.",response));
     }
 
     @GetMapping("/startups/{userId}")

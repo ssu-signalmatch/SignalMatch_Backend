@@ -6,6 +6,7 @@ import com.signalmatch_backend.investor.dto.InvestorProfileCreateRequest;
 import com.signalmatch_backend.investor.dto.InvestorProfileCreateResponse;
 import com.signalmatch_backend.investor.dto.InvestorProfileInfo;
 import com.signalmatch_backend.investor.dto.InvestorProfileUpdateRequest;
+import com.signalmatch_backend.investor.dto.InvestorProfileUpdateResponse;
 import com.signalmatch_backend.investor.service.InvestorService;
 import com.signalmatch_backend.user.jwt.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
@@ -40,10 +41,10 @@ public class InvestorController {
 
     @PatchMapping("/investors/me")
     @Operation(summary = "투자자 프로필 수정", description = "투자자 프로필을 수정합니다.")
-    public ResponseEntity<ApiResponse<Void>> investorProfileUpdate(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Valid @RequestBody InvestorProfileUpdateRequest request){
+    public ResponseEntity<ApiResponse<InvestorProfileUpdateResponse>> investorProfileUpdate(@AuthenticationPrincipal CustomUserDetails customUserDetails, @Valid @RequestBody InvestorProfileUpdateRequest request){
         Long userId = customUserDetails.getUser().getUserId();
-        investorService.updateInvestorProfile(userId,request);
-        return ResponseEntity.ok(ApiResponse.success("투자자 프로필 수정이 완료되었습니다."));
+        InvestorProfileUpdateResponse response = investorService.updateInvestorProfile(userId, request);
+        return ResponseEntity.ok(ApiResponse.success("투자자 프로필 수정이 완료되었습니다.",response));
     }
 
     @GetMapping("/investors/{userId}")

@@ -5,6 +5,8 @@ import com.signalmatch_backend.investor.domain.InvestorPreferredArea;
 import java.util.List;
 
 public record InvestorSearch(
+    String userId,
+    String investorId,
     String investorName,
     String intro,
     String organizationName,
@@ -19,6 +21,8 @@ public record InvestorSearch(
             .toList();
 
         return new InvestorSearch(
+            investor.getOwner().getUserId().toString(),
+            investor.getInvestorId().toString(),
             investor.getInvestorName(),
             investor.getIntro(),
             investor.getOrganizationName(),

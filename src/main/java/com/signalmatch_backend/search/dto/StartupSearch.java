@@ -5,6 +5,8 @@ import com.signalmatch_backend.startup.domain.StartupBusinessArea;
 import java.util.List;
 
 public record StartupSearch(
+    String userId,
+    String startupId,
     String startupName,
     String intro,
     String legalType,
@@ -20,6 +22,8 @@ public record StartupSearch(
             .toList();
 
         return new StartupSearch(
+            startup.getOwner().getUserId().toString(),
+            startup.getStartupId().toString(),
             startup.getStartupName(),
             startup.getStartupProfile().getIntro(),
             startup.getStartupProfile().getLegalType().name(),

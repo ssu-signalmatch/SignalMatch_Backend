@@ -6,6 +6,7 @@ import com.signalmatch_backend.bookmark.repository.BookmarkRepository;
 import com.signalmatch_backend.common.exception.CustomException;
 import com.signalmatch_backend.common.exception.ErrorCode;
 import com.signalmatch_backend.investor.domain.Investor;
+import com.signalmatch_backend.investor.dto.InvestorProfileUpdateResponse;
 import com.signalmatch_backend.startup.StartupFinder;
 import com.signalmatch_backend.startup.domain.Startup;
 import com.signalmatch_backend.startup.domain.StartupBusinessArea;
@@ -20,6 +21,7 @@ import com.signalmatch_backend.startup.dto.StartupProfileCreateRequest;
 import com.signalmatch_backend.startup.dto.StartupProfileCreateResponse;
 import com.signalmatch_backend.startup.dto.StartupProfileInfo;
 import com.signalmatch_backend.startup.dto.StartupProfileUpdateRequest;
+import com.signalmatch_backend.startup.dto.StartupProfileUpdateResponse;
 import com.signalmatch_backend.startup.repository.StartupBusinessAreaRepository;
 import com.signalmatch_backend.startup.repository.StartupRepository;
 import com.signalmatch_backend.user.UserFinder;
@@ -99,7 +101,7 @@ public class StartupService {
 
     }
     @Transactional
-    public void updateStartupProfile(Long userId, StartupProfileUpdateRequest request){
+    public StartupProfileUpdateResponse updateStartupProfile(Long userId, StartupProfileUpdateRequest request){
         User owner = userFinder.findByUserId(userId);
         Startup startup = startupRepository.findByOwner(owner)
             .orElseThrow(() -> new CustomException(ErrorCode.STARTUP_NOT_FOUND));
@@ -109,6 +111,12 @@ public class StartupService {
         if(request.businessAreas() != null){
             updateBusinessAreas(startup,request.businessAreas());
         }
+        startupRepository.saveAndFlush(startup);
+
+        return new StartupProfileUpdateResponse(
+            startup.getStartupId().toString(),
+            startup.getUpdatedAt().toString()
+        );
 
     }
 
