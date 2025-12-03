@@ -18,11 +18,14 @@ public interface BookmarkRepository extends JpaRepository<Bookmark,Long> {
     List<Bookmark> findByUserId(Long userId);
 
     @Query("SELECT new com.signalmatch_backend.bookmark.dto.StartupBookmarkInfo(" +
-        "s.startupId, s.startupName, sp.intro, COUNT(b)) " +
+        "s.owner.userId, " +   // startupId 제거됨, userId가 첫 번째
+        "s.startupName, " +
+        "sp.intro, " +
+        "COUNT(b)) " +
         "FROM Startup s " +
         "LEFT JOIN s.startupProfile sp " +
         "LEFT JOIN Bookmark b ON b.startupId = s.startupId " +
-        "GROUP BY s.startupId, s.startupName, sp.intro " +
+        "GROUP BY s.owner.userId, s.startupName, sp.intro " +
         "ORDER BY COUNT(b) DESC")
     List<StartupBookmarkInfo> findTop10ByBookmarkCount(Pageable pageable);
 

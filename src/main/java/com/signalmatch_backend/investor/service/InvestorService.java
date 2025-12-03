@@ -19,6 +19,7 @@ import com.signalmatch_backend.investor.dto.InvestorProfileCreateRequest;
 import com.signalmatch_backend.investor.dto.InvestorProfileCreateResponse;
 import com.signalmatch_backend.investor.dto.InvestorProfileInfo;
 import com.signalmatch_backend.investor.dto.InvestorProfileUpdateRequest;
+import com.signalmatch_backend.investor.dto.InvestorProfileUpdateResponse;
 import com.signalmatch_backend.investor.repository.InvestorPreferredAreaRepository;
 import com.signalmatch_backend.investor.repository.InvestorPreferredStageRepository;
 import com.signalmatch_backend.investor.repository.InvestorRepository;
@@ -89,7 +90,7 @@ public class InvestorService {
         
     }
     @Transactional
-    public void updateInvestorProfile(Long userId, InvestorProfileUpdateRequest request){
+    public InvestorProfileUpdateResponse updateInvestorProfile(Long userId, InvestorProfileUpdateRequest request){
         User owner = userFinder.findByUserId(userId);
         Investor investor = investorRepository.findByOwner(owner).orElseThrow(() -> new CustomException(ErrorCode.INVESTOR_NOT_FOUND));
         investor.update(request);
@@ -100,6 +101,12 @@ public class InvestorService {
         if(request.preferredAreas() != null){
             updatePreferredAreas(investor,request.preferredAreas());
         }
+        investorRepository.saveAndFlush(investor);
+
+        return new InvestorProfileUpdateResponse(
+            investor.getInvestorId().toString(),
+            investor.getUpdatedAt().toString()
+        );
 
     }
 

@@ -8,7 +8,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor
 public class StartupBookmarkInfo {
-    private Long startupId;
+    private Long userId;
     private String startupName;
     private String intro;
     private Long bookmarkCount;
