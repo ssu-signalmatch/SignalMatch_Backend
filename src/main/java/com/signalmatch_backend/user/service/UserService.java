@@ -78,16 +78,18 @@ public class UserService {
 
         if(user.getUserRole().equals(UserRole.INVESTOR)){
             Investor investor = investorFinder.findByOwner(user);
+            String updatedAt = investor.getUpdatedAt().toString();
             long bookmarkCount = investorService.getMyBookmarkCount(investor.getInvestorId());
             InvestorProfileInfo profile = investorService.findInvestorProfile(userId);
             String profileImageUrl = documentService.getLatestProfileImageUrl(userId);
-            return InvestorMyPageResponse.of(profile, bookmarkCount, profileImageUrl);
+            return InvestorMyPageResponse.of(profile, bookmarkCount, profileImageUrl,updatedAt);
         }else{
             Startup startup = startupFinder.findByOwner(user);
+            String updatedAt = startup.getUpdatedAt().toString();
             long bookmarkCount = startupService.getMyBookmarkCount(startup.getStartupId());
             StartupProfileInfo profile = startupService.findStartupProfile(userId);
             String profileImageUrl = documentService.getLatestProfileImageUrl(userId);
-            return StartupMyPageResponse.of(profile, bookmarkCount, profileImageUrl   );
+            return StartupMyPageResponse.of(profile, bookmarkCount, profileImageUrl,updatedAt   );
         }
     }
 }
