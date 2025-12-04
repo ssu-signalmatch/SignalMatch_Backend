@@ -19,7 +19,6 @@ import org.springframework.web.bind.annotation.*;
 @RequestMapping("/api")
 @Tag(name = "User", description = "로그인 관련 API입니다.")
 public class UserController {
-
     private final UserService userService;
 
     @PostMapping("/auth/signup")
@@ -31,41 +30,27 @@ public class UserController {
 
     @PostMapping("/auth/login")
     @Operation(summary = "로그인", description = "아이디, 비밀번호를 받아 jwt 토큰을 발급하는 API입니다.")
-    public ResponseEntity<ApiResponse<LoginResponse>> login(
-        @RequestBody LoginRequest loginRequest) {
+    public ResponseEntity<ApiResponse<LoginResponse>> login(@RequestBody LoginRequest loginRequest) {
         LoginResponse response = userService.login(loginRequest);
-        return ResponseEntity.ok(ApiResponse.success("로그인이 완료되었습니다.", response));
+        return ResponseEntity.ok(ApiResponse.success("로그인이 완료되었습니다.",response));
     }
 
     @DeleteMapping("/auth")
     @Operation(summary = "회원 탈퇴", description = "회원 정보를 삭제하는 API입니다.")
-    public ResponseEntity<ApiResponse<Void>> delete(
-        @AuthenticationPrincipal CustomUserDetails customUserDetails) {
+    public ResponseEntity<ApiResponse<Void>> delete(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Long userId = customUserDetails.getUser().getUserId();
         userService.delete(userId);
         return ResponseEntity.ok(ApiResponse.success("회원이 삭제되었습니다."));
     }
 
-    //    @GetMapping("/me")
-//    @Operation(summary = "마이페이지", description = "회원의 정보를 조회하는 API입니다.")
-//    public ResponseEntity<ApiResponse<MyPageResponse>> getMyPage(@AuthenticationPrincipal CustomUserDetails customUserDetails) {
-//        Long userId = customUserDetails.getUser().getUserId();
-//        MyPageResponse myPageResponse = userService.getMyPage(userId);
-//        return ResponseEntity.ok(ApiResponse.success("회원정보가 조회되었습니다.",myPageResponse));
-//    }
     @GetMapping({"/me", "/me/{userId}"})
     @Operation(summary = "마이페이지", description = "회원 정보를 조회합니다. URL에 userId가 있으면 해당 회원을, 없으면 로그인한 본인의 정보를 조회합니다.")
-    public ResponseEntity<ApiResponse<MyPageResponse>> getMyPage(
-        @PathVariable(required = false) Long userId,
-        @AuthenticationPrincipal CustomUserDetails customUserDetails
-    ) {
+    public ResponseEntity<ApiResponse<MyPageResponse>> getMyPage(@PathVariable(required = false) Long userId, @AuthenticationPrincipal CustomUserDetails customUserDetails) {
         Long targetId;
 
         if (userId != null) {
-            // 1. URL 경로에 userId가 있는 경우 (/me/123) -> 해당 ID 사용
             targetId = userId;
         } else {
-            // 2. URL 경로에 userId가 없는 경우 (/me) -> 로그인한 사용자 정보 사용
             targetId = customUserDetails.getUser().getUserId();
         }
 
