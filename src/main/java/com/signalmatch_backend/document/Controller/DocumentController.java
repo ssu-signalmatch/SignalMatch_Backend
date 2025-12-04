@@ -44,6 +44,16 @@ public class DocumentController {
         return ResponseEntity.ok(ApiResponse.success("문서가 조회되었습니다.",response));
     }
 
+    @GetMapping("/{userId}")
+    @Operation(summary = "다른 사용자 문서 조회하기", description = "presign url을 통해 등록한 IR 문서를 조회하는 API입니다.")
+    public ResponseEntity<ApiResponse<List<DocumentResponse>>> getMyUserDocument(
+            @PathVariable Long userId ){
+        List<DocumentResponse> response = documentService.getMyIrDocuments(userId);
+
+        return ResponseEntity.ok(ApiResponse.success("다른 사용자의 문서가 조회되었습니다.",response));
+    }
+
+
     @DeleteMapping("/{documentId}")
     @Operation(summary = "문서 삭제하기", description = "S3와 DB에서 문서를 삭제합니다.")
     public ResponseEntity<ApiResponse<Void>> deleteDocument(
