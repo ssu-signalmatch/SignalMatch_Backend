@@ -8,8 +8,10 @@ import com.signalmatch_backend.bookmark.dto.StartupBookmarkInfo;
 import com.signalmatch_backend.bookmark.repository.BookmarkRepository;
 import com.signalmatch_backend.common.exception.CustomException;
 import com.signalmatch_backend.common.exception.ErrorCode;
+import com.signalmatch_backend.investor.InvestorFinder;
 import com.signalmatch_backend.investor.domain.Investor;
 import com.signalmatch_backend.investor.repository.InvestorRepository;
+import com.signalmatch_backend.startup.StartupFinder;
 import com.signalmatch_backend.startup.domain.Startup;
 import com.signalmatch_backend.startup.repository.StartupRepository;
 import com.signalmatch_backend.user.UserFinder;
@@ -32,11 +34,12 @@ public class BookmarkService {
     private final UserFinder userFinder;
     private final InvestorRepository investorRepository;
     private final StartupRepository startupRepository;
-
+    private final InvestorFinder investorFinder;
+    private final StartupFinder startupFinder;
     public BookmarkResponse addBookmark(Long userId, BookmarkRequest request){
         Long investorId = request.investorId();
         Long startupId = request.startupId();
-
+        Long targetUserId;
         if((investorId == null && startupId == null)|| (investorId != null && startupId != null)){
             throw new CustomException(ErrorCode.BOOKMARK_ONLY_ONE_TARGET_ALLOWED);
         }
@@ -51,7 +54,14 @@ public class BookmarkService {
             .build();
         Bookmark savedBookmark = bookmarkRepository.save(bookmark);
 
-        return new BookmarkResponse(savedBookmark.getBookmarkId(),savedBookmark.getInvestorId(),savedBookmark.getStartupId());
+        if (investorId != null) {
+            Investor investor = investorFinder.findByInvestorId(investorId);
+            targetUserId = investor.getOwner().getUserId();
+        } else {
+            Startup startup = startupFinder.findByStartupId(startupId);
+            targetUserId = startup.getOwner().getUserId();
+        }
+        return new BookmarkResponse(savedBookmark.getBookmarkId(),userId,targetUserId);
     }
 
     public List<BookmarkListResponse> getBookmarkList(Long userId){
