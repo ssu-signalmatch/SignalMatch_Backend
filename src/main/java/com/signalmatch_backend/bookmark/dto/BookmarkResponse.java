@@ -2,9 +2,9 @@ package com.signalmatch_backend.bookmark.dto;
 
 public record BookmarkResponse(
     Long bookmarkId,
-    Long investorId,
+    Long userId,
 
-    Long startupId
+    Long targetUserId
 
 ) {
 
