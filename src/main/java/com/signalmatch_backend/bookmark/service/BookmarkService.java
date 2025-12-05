@@ -78,6 +78,7 @@ public class BookmarkService {
                     return new BookmarkListResponse(
                         "INVESTOR",
                         investor.getInvestorId(),
+                        investor.getOwner().getUserId(),
                         investor.getInvestorName()
                     );
                 } else if (bookmark.getStartupId() != null) {
@@ -86,6 +87,7 @@ public class BookmarkService {
                     return new BookmarkListResponse(
                         "STARTUP",
                         startup.getStartupId(),
+                        startup.getOwner().getUserId(),
                         startup.getStartupName()
                     );
                 } else {

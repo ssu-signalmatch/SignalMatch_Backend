@@ -8,7 +8,8 @@ import lombok.Builder;
 @Builder
 public record BookmarkListResponse(
     String targetType,
-    Long targetId,
+    Long targetTypeId,
+    Long targetUserId,
     String name
 
 ) {
