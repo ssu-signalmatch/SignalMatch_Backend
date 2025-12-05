@@ -37,16 +37,25 @@ public class BookmarkService {
     private final InvestorFinder investorFinder;
     private final StartupFinder startupFinder;
     public BookmarkResponse addBookmark(Long userId, BookmarkRequest request){
-        Long investorId = request.investorId();
-        Long startupId = request.startupId();
-        Long targetUserId;
-        if((investorId == null && startupId == null)|| (investorId != null && startupId != null)){
-            throw new CustomException(ErrorCode.BOOKMARK_ONLY_ONE_TARGET_ALLOWED);
+        Long investorId = null;
+        Long startupId = null;
+
+        User targetUser = userFinder.findByUserId(request.targetUserId());
+
+        if(targetUser.getUserRole().equals(UserRole.INVESTOR)){
+            Investor investor = investorFinder.findByOwner(targetUser);
+            investorId = investor.getInvestorId();
+        }
+
+        if(targetUser.getUserRole().equals(UserRole.STARTUP)){
+            Startup startup = startupFinder.findByOwner(targetUser);
+            startupId = startup.getStartupId();
         }
 
         if (bookmarkRepository.existsByUserIdAndInvestorIdAndStartupId(userId, investorId, startupId)){
             throw new CustomException(ErrorCode.BOOKMARK_ALREADY_EXISTS);
         }
+
         Bookmark bookmark= Bookmark.builder()
             .userId(userId)
             .investorId(investorId)
@@ -54,14 +63,7 @@ public class BookmarkService {
             .build();
         Bookmark savedBookmark = bookmarkRepository.save(bookmark);
 
-        if (investorId != null) {
-            Investor investor = investorFinder.findByInvestorId(investorId);
-            targetUserId = investor.getOwner().getUserId();
-        } else {
-            Startup startup = startupFinder.findByStartupId(startupId);
-            targetUserId = startup.getOwner().getUserId();
-        }
-        return new BookmarkResponse(savedBookmark.getBookmarkId(),userId,targetUserId);
+        return new BookmarkResponse(savedBookmark.getBookmarkId(),userId,request.targetUserId());
     }
 
     public List<BookmarkListResponse> getBookmarkList(Long userId){
