@@ -14,11 +14,10 @@ public interface ChatRoomRepository extends JpaRepository<ChatRoom, Long> {
     // 스타트업–투자자 조합으로 채팅방 찾기
     Optional<ChatRoom> findByStartupIdAndInvestorId(Long startupId, Long investorId);
 
-    @Query("""
-        select r
-        from ChatRoom r
-        where (:role = 'STARTUP' and r.startupId = :userId)
-           or (:role = 'INVESTOR' and r.investorId = :userId)
-        """)
     List<ChatRoom> findAllByUser(Long userId, String role);
+
+
+    List<ChatRoom> findAllByStartupId(Long startupId);
+
+    List<ChatRoom> findAllByInvestorId(Long investorId);
 }

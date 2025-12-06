@@ -15,7 +15,10 @@ import com.signalmatch_backend.common.exception.CustomException;
 import com.signalmatch_backend.common.exception.ErrorCode;
 import com.signalmatch_backend.document.Service.DocumentService;
 import com.signalmatch_backend.investor.InvestorFinder;
+import com.signalmatch_backend.investor.domain.Investor;
 import com.signalmatch_backend.startup.StartupFinder;
+import com.signalmatch_backend.startup.domain.Startup;
+import com.signalmatch_backend.user.UserFinder;
 import com.signalmatch_backend.user.domain.User;
 import com.signalmatch_backend.user.domain.enums.UserRole;
 import com.signalmatch_backend.user.repository.UserRepository;
@@ -40,6 +43,7 @@ public class ChatService {
     private final InvestorFinder investorFinder;
     private final DocumentService documentService;
     private final UserRepository userRepository;
+    private final UserFinder userFinder;
 
     @Transactional
     public ChatRoomResponse createOrGetRoom(User user, ChatRoomCreateRequest request) {
@@ -93,7 +97,6 @@ public class ChatService {
 
         return ChatMessageResponse.from(chatMessageRepository.save(message));
     }
-
 
 
     private void validateSender(ChatRoom room, UserRole role, Long senderId) {
@@ -171,67 +174,117 @@ public class ChatService {
 
     public List<ChatRoomListResponse> getChatRooms(Long userId, UserRole role) {
 
-        // 1) 현재 유저가 참여한 모든 채팅방 조회
-        List<ChatRoom> rooms = chatRoomRepository.findAllByUser(userId, role.name());
+        User me = userFinder.findByUserId(userId);
+
+        List<ChatRoom> rooms;
+        if (role == UserRole.STARTUP) {
+            Startup myStartup = startupFinder.findByOwner(me);
+            Long myStartupId = myStartup.getStartupId();
+
+            rooms = chatRoomRepository.findAllByStartupId(myStartupId);
+
+        } else if (role == UserRole.INVESTOR) {
+            Investor myInvestor = investorFinder.findByOwner(me);
+            Long myInvestorId = myInvestor.getInvestorId();
+
+            rooms = chatRoomRepository.findAllByInvestorId(myInvestorId);
+
+        } else {
+            throw new CustomException(ErrorCode.ACCESS_DENIED);
+        }
 
         if (rooms.isEmpty()) {
             return List.of();
         }
 
-        // 2) 상대방 userId 목록 추출
-        List<Long> opponentIds = rooms.stream()
-                .map(room -> role == UserRole.STARTUP ? room.getInvestorId() : room.getStartupId())
-                .distinct()
-                .toList();
+        if (role == UserRole.STARTUP) {
+            List<Long> opponentInvestorIds = rooms.stream()
+                    .map(ChatRoom::getInvestorId)
+                    .distinct()
+                    .toList();
 
-        // 3) 상대 유저 정보 한 번에 조회 후 Map으로 보관 (id -> User)
-        Map<Long, User> opponentMap = userRepository.findAllById(opponentIds)
-                .stream()
-                .collect(Collectors.toMap(User::getUserId, u -> u));
+            Map<Long, User> opponentUserMap = opponentInvestorIds.stream()
+                    .map(investorId -> investorFinder.findByInvestorId(investorId))
+                    .collect(Collectors.toMap(
+                            inv -> inv.getInvestorId(),
+                            Investor::getOwner
+                    ));
 
+            return buildChatRoomListResponses(
+                    rooms,
+                    role,
+                    opponentUserMap,
+                    true
+            );
+
+        } else {
+            List<Long> opponentStartupIds = rooms.stream()
+                    .map(ChatRoom::getStartupId)
+                    .distinct()
+                    .toList();
+
+            Map<Long, User> opponentUserMap = opponentStartupIds.stream()
+                    .map(startupId -> startupFinder.findByStartupId(startupId))
+                    .collect(Collectors.toMap(
+                            st -> st.getStartupId(),
+                            Startup::getOwner
+                    ));
+
+            return buildChatRoomListResponses(
+                    rooms,
+                    role,
+                    opponentUserMap,
+                    false
+            );
+        }
+    }
+    private List<ChatRoomListResponse> buildChatRoomListResponses(
+            List<ChatRoom> rooms,
+            UserRole meRole,
+            Map<Long, User> opponentUserMap,
+            boolean isStartupSide
+    ) {
         List<ChatRoomListResponse> result = new ArrayList<>();
 
         for (ChatRoom room : rooms) {
-            Long opponentId = (role == UserRole.STARTUP)
-                    ? room.getInvestorId()
-                    : room.getStartupId();
 
-            User opponent = opponentMap.get(opponentId);
-            if (opponent == null) {
-                // 혹시라도 user가 삭제되어 없는 경우
+            // 상대 도메인 PK (InvestorId 또는 StartupId)
+            Long opponentDomainId = isStartupSide ? room.getInvestorId() : room.getStartupId();
+
+            User opponentUser = opponentUserMap.get(opponentDomainId);
+            if (opponentUser == null) {
                 throw new CustomException(ErrorCode.USER_NOT_FOUND);
             }
 
-            // 4) 마지막 메시지 조회
+            // 마지막 메시지
             Optional<ChatMessage> lastOpt =
                     chatMessageRepository.findTopByChatRoomIdAndDeletedFalseOrderByIdDesc(room.getId());
 
             String lastContent = lastOpt.map(ChatMessage::getContent).orElse(null);
             LocalDateTime lastTime = lastOpt.map(ChatMessage::getCreatedAt).orElse(null);
 
-            // 5) 안 읽은 메시지 개수 계산 (상대가 보낸 & 내가 아직 안 읽은 것만)
+            // 안 읽은 메시지 개수
             long unreadCount;
-            if (role == UserRole.STARTUP) {
+            if (meRole == UserRole.STARTUP) {
                 unreadCount = chatMessageRepository
                         .countByChatRoomIdAndDeletedFalseAndSenderRoleNotAndReadByStartupFalse(
-                                room.getId(), role
+                                room.getId(), meRole
                         );
-            } else { // INVESTOR
+            } else {
                 unreadCount = chatMessageRepository
                         .countByChatRoomIdAndDeletedFalseAndSenderRoleNotAndReadByInvestorFalse(
-                                room.getId(), role
+                                room.getId(), meRole
                         );
             }
 
-            // 6) 상대방 최신 프로필 이미지 URL (없으면 null)
-            String opponentProfileImageUrl = documentService.getLatestProfileImageUrl(opponentId);
+            Long opponentUserId = opponentUser.getUserId();
+            String opponentProfileImageUrl = documentService.getLatestProfileImageUrl(opponentUserId);
 
-            // 7) DTO 빌드
             result.add(
                     ChatRoomListResponse.builder()
                             .roomId(room.getId())
-                            .opponentId(opponentId)
-                            .opponentName(opponent.getName())
+                            .opponentId(opponentDomainId)            // startupId 또는 investorId
+                            .opponentName(opponentUser.getName())
                             .opponentProfileImage(opponentProfileImageUrl)
                             .lastMessage(lastContent)
                             .lastMessageTime(lastTime)
@@ -240,7 +293,6 @@ public class ChatService {
             );
         }
 
-        // 8) 마지막 메시지 시간 기준으로 내림차순 정렬 (최신 채팅방이 위로 오게)
         result.sort(
                 Comparator.comparing(
                         ChatRoomListResponse::lastMessageTime,
@@ -250,5 +302,4 @@ public class ChatService {
 
         return result;
     }
-
 }

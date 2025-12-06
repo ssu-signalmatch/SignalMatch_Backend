@@ -7,6 +7,7 @@ import com.signalmatch_backend.user.domain.User;
 import com.signalmatch_backend.user.domain.enums.UserRole;
 import com.signalmatch_backend.user.jwt.CustomUserDetails;
 import io.swagger.v3.oas.annotations.Operation;
+import io.swagger.v3.oas.annotations.tags.Tag;
 import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import org.springframework.http.ResponseEntity;
@@ -18,6 +19,7 @@ import java.util.List;
 @RestController
 @RequiredArgsConstructor
 @RequestMapping("/api/chats")
+@Tag(name = "Chat",description = "채팅 관련 API입니다.")
 public class ChatController {
 
     private final ChatService chatService;
