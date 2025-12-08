@@ -99,16 +99,6 @@ public class ChatService {
     }
 
 
-    private void validateSender(ChatRoom room, UserRole role, Long senderId) {
-        if (role == UserRole.STARTUP && !room.getStartupId().equals(senderId)) {
-            throw new CustomException(ErrorCode.CHAT_SENDER_INVALID);
-        }
-
-        if (role == UserRole.INVESTOR && !room.getInvestorId().equals(senderId)) {
-            throw new CustomException(ErrorCode.CHAT_SENDER_INVALID);
-        }
-    }
-
     @Transactional
     public List<ChatMessageResponse> getMessages(
             Long roomId,
@@ -163,11 +153,23 @@ public class ChatService {
      */
     private void validateParticipant(ChatRoom room, Long userId, UserRole role) {
 
-        if (role == UserRole.STARTUP && !room.getStartupId().equals(userId)) {
-            throw new CustomException(ErrorCode.ACCESS_DENIED);
-        }
+        User user = userFinder.findByUserId(userId);
 
-        if (role == UserRole.INVESTOR && !room.getInvestorId().equals(userId)) {
+        if (role == UserRole.STARTUP) {
+            Startup myStartup = startupFinder.findByOwner(user);
+            Long myStartupId = myStartup.getStartupId();
+
+            if (!room.getStartupId().equals(myStartupId)) {
+                throw new CustomException(ErrorCode.ACCESS_DENIED);
+            }
+        } else if (role == UserRole.INVESTOR) {
+            Investor myInvestor = investorFinder.findByOwner(user);
+            Long myInvestorId = myInvestor.getInvestorId();
+
+            if (!room.getInvestorId().equals(myInvestorId)) {
+                throw new CustomException(ErrorCode.ACCESS_DENIED);
+            }
+        } else {
             throw new CustomException(ErrorCode.ACCESS_DENIED);
         }
     }
